@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>24 Hours - Fast Tracker</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rubik:wght@300;400;500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Rubik', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0033 50%, #000000 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #00ff41;
+            box-shadow: 0 4px 20px rgba(0, 255, 65, 0.3);
+        }
+
+        .app-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #00ff41, #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px rgba(0, 255, 65, 0.5)); }
+            to { filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.8)); }
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            color: #00ff41;
+            font-family: 'Orbitron', monospace;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .nav-tab.active {
+            background: rgba(0, 255, 65, 0.2);
+            border-color: #00ff41;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .timer-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 0;
+        }
+
+        .timer-circle {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 255, 65, 0.1) 0%, rgba(0, 255, 65, 0) 70%);
+            border: 4px solid #00ff41;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.5),
+                        inset 0 0 50px rgba(0, 255, 65, 0.2);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .timer-display {
+            font-family: 'Orbitron', monospace;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #00ff41;
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.8);
+        }
+
+        .timer-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #00ff41, #00cc33);
+            color: #000;
+            box-shadow: 0 4px 20px rgba(0, 255, 65, 0.4);
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0, 255, 65, 0.6);
+        }
+
+        .btn-slip {
+            background: linear-gradient(135deg, #a855f7, #8b5cf6);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn-slip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(168, 85, 247, 0.6);
+        }
+
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .todo-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .todo-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .todo-input {
+            flex: 1;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(0, 255, 65, 0.3);
+            color: #fff;
+            font-size: 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .todo-input:focus {
+            outline: none;
+            border-color: #00ff41;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+        }
+
+        .todo-list {
+            list-style: none;
+        }
+
+        .todo-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s;
+        }
+
+        .todo-item.completed {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+
+        .todo-checkbox {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #00ff41;
+        }
+
+        .calendar-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .calendar-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            color: #00ff41;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day-header {
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+            color: #00ff41;
+            font-size: 0.9rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .calendar-day.success {
+            background: rgba(0, 255, 65, 0.2);
+            border-color: #00ff41;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+
+        .calendar-day.failed {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: #a855f7;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+        }
+
+        .calendar-day.today {
+            border: 2px solid #fff;
+            font-weight: bold;
+        }
+
+        .bilateral-container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .disclaimer {
+            background: rgba(255, 193, 7, 0.1);
+            border: 2px solid rgba(255, 193, 7, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .disclaimer-title {
+            color: #ffc107;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .bilateral-display {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .bilateral-dot {
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, #00ff41, rgba(0, 255, 65, 0.3));
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.8);
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .bilateral-dot.left {
+            transform: translateX(-100px);
+        }
+
+        .bilateral-dot.right {
+            transform: translateX(100px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            color: #00ff41;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 5px;
+        }
+
+        .quote-container {
+            background: rgba(0, 255, 65, 0.05);
+            border-left: 4px solid #00ff41;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .quote-text {
+            font-style: italic;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .quote-author {
+            text-align: right;
+            margin-top: 10px;
+            color: #00ff41;
+            font-weight: 500;
+        }
+
+        @media (max-width: 480px) {
+            .app-title {
+                font-size: 2rem;
+            }
+            
+            .timer-circle {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .timer-display {
+                font-size: 2.5rem;
+            }
+            
+            .nav-tab {
+                font-size: 0.8rem;
+                padding: 10px 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <h1 class="app-title">24 HOURS</h1>
+        </header>
+
+        <nav class="nav-tabs">
+            <div class="nav-tab active" data-tab="timer">Timer</div>
+            <div class="nav-tab" data-tab="tasks">Tasks</div>
+            <div class="nav-tab" data-tab="calendar">Calendar</div>
+            <div class="nav-tab" data-tab="focus">Focus</div>
+        </nav>
+
+        <!-- Timer Section -->
+        <div id="timer" class="content active">
+            <div class="timer-container">
+                <div class="timer-circle">
+                    <div class="timer-display" id="timerDisplay">24:00:00</div>
+                    <div class="timer-label">Time Remaining</div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-start" id="startBtn">Start Fast</button>
+                    <button class="btn btn-slip" id="slipBtn" style="display:none;">I Slipped (+30min)</button>
+                    <button class="btn btn-reset" id="resetBtn" style="display:none;">Complete Fast</button>
+                </div>
+            </div>
+
+            <div class="quote-container">
+                <div class="quote-text" id="quoteText">"The journey of a thousand miles begins with a single step."</div>
+                <div class="quote-author" id="quoteAuthor">- Lao Tzu</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="currentStreak">0</div>
+                    <div class="stat-label">Current Streak</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalFasts">0</div>
+                    <div class="stat-label">Total Fasts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="successRate">0%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tasks Section -->
+        <div id="tasks" class="content">
+            <div class="todo-container">
+                <div class="todo-input-group">
+                    <input type="text" class="todo-input" id="todoInput" placeholder="Enter a task to complete today...">
+                    <button class="btn btn-start" id="addTodoBtn">Add</button>
+                </div>
+                
+                <ul class="todo-list" id="todoList"></ul>
+            </div>
+        </div>
+
+        <!-- Calendar Section -->
+        <div id="calendar" class="content">
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <button class="btn btn-reset" id="prevMonthBtn">←</button>
+                    <div class="calendar-title" id="calendarTitle">September 2025</div>
+                    <button class="btn btn-reset" id="nextMonthBtn">→</button>
+                </div>
+                
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+        </div>
+
+        <!-- Focus Tool Section -->
+        <div id="focus" class="content">
+            <div class="bilateral-container">
+                <div class="disclaimer">
+                    <div class="disclaimer-title">⚠️ Important Notice</div>
+                    <div>This bilateral stimulation tool is for focus and distraction only. It is NOT a substitute for professional therapy or medical treatment.</div>
+                </div>
+                
+                <div class="bilateral-display">
+                    <div class="bilateral-dot" id="bilateralDot"></div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-start" id="bilateralBtn">Start Focus Session</button>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="focusTime">0</div>
+                        <div class="stat-label">Minutes Focused</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Wait for DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('App starting...');
+            
+            // App State
+            let appState = {
+                timerActive: false,
+                startTime: null,
+                endTime: null,
+                slipMinutes: 0,
+                todos: [],
+                fastHistory: {},
+                currentStreak: 0,
+                totalFasts: 0,
+                successfulFasts: 0,
+                bilateralActive: false,
+                focusMinutes: 0,
+                currentMonth: new Date().getMonth(),
+                currentYear: new Date().getFullYear()
+            };
+
+            // Timer variables
+            let timerInterval = null;
+            let bilateralInterval = null;
+            let bilateralStartTime = null;
+
+            // Quotes
+            const quotes = [
+                { text: "The journey of a thousand miles begins with a single step.", author: "Lao Tzu" },
+                { text: "I can do all things through Christ who strengthens me.", author: "Philippians 4:13" },
+                { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
+                { text: "Every moment is a fresh beginning.", author: "T.S. Eliot" },
+                { text: "With God all things are possible.", author: "Matthew 19:26" }
+            ];
+
+            // Load state from localStorage
+            function loadState() {
+                try {
+                    const saved = localStorage.getItem('24hoursAppState');
+                    if (saved) {
+                        appState = JSON.parse(saved);
+                        updateUI();
+                    }
+                } catch (e) {
+                    console.log('Could not load saved state');
+                }
+            }
+
+            // Save state to localStorage
+            function saveState() {
+                try {
+                    localStorage.setItem('24hoursAppState', JSON.stringify(appState));
+                } catch (e) {
+                    console.log('Could not save state');
+                }
+            }
+
+            // Tab switching
+            function switchTab(tabName) {
+                console.log('Switching to tab:', tabName);
+                
+                // Remove active from all tabs and contents
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.querySelectorAll('.content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Add active to selected tab and content
+                const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
+                const selectedContent = document.getElementById(tabName);
+                
+                if (selectedTab) selectedTab.classList.add('active');
+                if (selectedContent) selectedContent.classList.add('active');
+                
+                if (tabName === 'calendar') {
+                    renderCalendar();
+                }
+            }
+
+            // Timer functions
+            function startTimer() {
+                console.log('Starting timer');
+                if (appState.timerActive) return;
+                
+                appState.timerActive = true;
+                appState.startTime = Date.now();
+                appState.endTime = Date.now() + (24 * 60 * 60 * 1000);
+                appState.slipMinutes = 0;
+                
+                document.getElementById('startBtn').style.display = 'none';
+                document.getElementById('slipBtn').style.display = 'inline-block';
+                document.getElementById('resetBtn').style.display = 'inline-block';
+                
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(updateTimer, 1000);
+                updateTimer();
+                saveState();
+            }
+
+            function updateTimer() {
+                if (!appState.timerActive) return;
+                
+                const now = Date.now();
+                const totalTime = (appState.endTime + (appState.slipMinutes * 60 * 1000)) - appState.startTime;
+                const elapsed = now - appState.startTime;
+                const remaining = totalTime - elapsed;
+                
+                if (remaining <= 0) {
+                    completeTimer(true);
+                    return;
+                }
+                
+                const hours = Math.floor(remaining / (1000 * 60 * 60));
+                const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+                
+                const display = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                document.getElementById('timerDisplay').textContent = display;
+            }
+
+            function addSlipTime() {
+                console.log('Adding slip time');
+                appState.slipMinutes += 30;
+                saveState();
+                
+                // Visual feedback
+                const timerCircle = document.querySelector('.timer-circle');
+                timerCircle.style.borderColor = '#a855f7';
+                setTimeout(() => {
+                    timerCircle.style.borderColor = '#00ff41';
+                }, 1000);
+            }
+
+            function resetTimer() {
+                console.log('Resetting timer');
+                completeTimer(false);
+            }
+
+            function completeTimer(success) {
+                appState.timerActive = false;
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                
+                // Record in history
+                const today = new Date().toISOString().split('T')[0];
+                appState.fastHistory[today] = success;
+                
+                // Update stats
+                appState.totalFasts++;
+                if (success) {
+                    appState.successfulFasts++;
+                    appState.currentStreak++;
+                } else {
+                    appState.currentStreak = 0;
+                }
+                
+                // Reset UI
+                document.getElementById('startBtn').style.display = 'inline-block';
+                document.getElementById('slipBtn').style.display = 'none';
+                document.getElementById('resetBtn').style.display = 'none';
+                document.getElementById('timerDisplay').textContent = '24:00:00';
+                
+                updateStats();
+                saveState();
+            }
+
+            // Todo functions
+            function addTodo() {
+                const input = document.getElementById('todoInput');
+                const text = input.value.trim();
+                
+                console.log('Adding todo:', text);
+                
+                if (text) {
+                    const todo = {
+                        id: Date.now(),
+                        text: text,
+                        completed: false
+                    };
+                    appState.todos.push(todo);
+                    input.value = '';
+                    renderTodos();
+                    saveState();
+                }
+            }
+
+            function renderTodos() {
+                const list = document.getElementById('todoList');
+                list.innerHTML = '';
+                
+                appState.todos.forEach(todo => {
+                    const li = document.createElement('li');
+                    li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+                    
+                    const wrapper = document.createElement('div');
+                    wrapper.style.display = 'flex';
+                    wrapper.style.alignItems = 'center';
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'todo-checkbox';
+                    checkbox.checked = todo.completed;
+                    checkbox.addEventListener('change', () => toggleTodo(todo.id));
+                    
+                    const text = document.createElement('span');
+                    text.textContent = todo.text;
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn btn-reset';
+                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.addEventListener('click', () => deleteTodo(todo.id));
+                    
+                    wrapper.appendChild(checkbox);
+                    wrapper.appendChild(text);
+                    li.appendChild(wrapper);
+                    li.appendChild(deleteBtn);
+                    
+                    list.appendChild(li);
+                });
+            }
+
+            function toggleTodo(id) {
+                console.log('Toggling todo:', id);
+                const todo = appState.todos.find(t => t.id === id);
+                if (todo) {
+                    todo.completed = !todo.completed;
+                    renderTodos();
+                    saveState();
+                }
+            }
+
+            function deleteTodo(id) {
+                console.log('Deleting todo:', id);
+                appState.todos = appState.todos.filter(t => t.id !== id);
+                renderTodos();
+                saveState();
+            }
+
+            // Calendar functions
+            function renderCalendar() {
+                const grid = document.getElementById('calendarGrid');
+                const title = document.getElementById('calendarTitle');
+                const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                               'July', 'August', 'September', 'October', 'November', 'December'];
+                
+                title.textContent = `${months[appState.currentMonth]} ${appState.currentYear}`;
+                
+                grid.innerHTML = '';
+                
+                // Add day headers
+                const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                dayHeaders.forEach(day => {
+                    const header = document.createElement('div');
+                    header.className = 'calendar-day-header';
+                    header.textContent = day;
+                    grid.appendChild(header);
+                });
+                
+                // Get first day and number of days
+                const firstDay = new Date(appState.currentYear, appState.currentMonth, 1).getDay();
+                const daysInMonth = new Date(appState.currentYear, appState.currentMonth + 1, 0).getDate();
+                const today = new Date();
+                
+                // Add empty cells
+                for (let i = 0; i < firstDay; i++) {
+                    grid.appendChild(document.createElement('div'));
+                }
+                
+                // Add days
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    dayElement.textContent = day;
+                    
+                    const dateStr = `${appState.currentYear}-${String(appState.currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    
+                    if (appState.fastHistory[dateStr] === true) {
+                        dayElement.classList.add('success');
+                    } else if (appState.fastHistory[dateStr] === false) {
+                        dayElement.classList.add('failed');
+                    }
+                    
+                    if (today.getDate() === day && today.getMonth() === appState.currentMonth && 
+                        today.getFullYear() === appState.currentYear) {
+                        dayElement.classList.add('today');
+                    }
+                    
+                    grid.appendChild(dayElement);
+                }
+            }
+
+            function changeMonth(direction) {
+                console.log('Changing month:', direction);
+                appState.currentMonth += direction;
+                if (appState.currentMonth < 0) {
+                    appState.currentMonth = 11;
+                    appState.currentYear--;
+                } else if (appState.currentMonth > 11) {
+                    appState.currentMonth = 0;
+                    appState.currentYear++;
+                }
+                renderCalendar();
+            }
+
+            // Bilateral stimulation
+            function toggleBilateral() {
+                console.log('Toggling bilateral');
+                const dot = document.getElementById('bilateralDot');
+                const btn = document.getElementById('bilateralBtn');
+                
+                if (appState.bilateralActive) {
+                    // Stop
+                    appState.bilateralActive = false;
+                    if (bilateralInterval) {
+                        clearInterval(bilateralInterval);
+                        bilateralInterval = null;
+                    }
+                    btn.textContent = 'Start Focus Session';
+                    dot.classList.remove('left', 'right');
+                    
+                    if (bilateralStartTime) {
+                        const elapsed = Math.floor((Date.now() - bilateralStartTime) / 60000);
+                        appState.focusMinutes += elapsed;
+                        document.getElementById('focusTime').textContent = appState.focusMinutes;
+                        saveState();
+                    }
+                } else {
+                    // Start
+                    appState.bilateralActive = true;
+                    btn.textContent = 'Stop Focus Session';
+                    bilateralStartTime = Date.now();
+                    
+                    let isLeft = true;
+                    dot.classList.add('left');
+                    
+                    bilateralInterval = setInterval(() => {
+                        if (isLeft) {
+                            dot.classList.remove('left');
+                            dot.classList.add('right');
+                        } else {
+                            dot.classList.remove('right');
+                            dot.classList.add('left');
+                        }
+                        isLeft = !isLeft;
+                    }, 500);
+                }
+            }
+
+            // Update stats
+            function updateStats() {
+                document.getElementById('currentStreak').textContent = appState.currentStreak;
+                document.getElementById('totalFasts').textContent = appState.totalFasts;
+                
+                const successRate = appState.totalFasts > 0 
+                    ? Math.round((appState.successfulFasts / appState.totalFasts) * 100)
+                    : 0;
+                document.getElementById('successRate').textContent = `${successRate}%`;
+            }
+
+            // Update UI from state
+            function updateUI() {
+                updateStats();
+                renderTodos();
+                
+                if (appState.timerActive && appState.startTime) {
+                    document.getElementById('startBtn').style.display = 'none';
+                    document.getElementById('slipBtn').style.display = 'inline-block';
+                    document.getElementById('resetBtn').style.display = 'inline-block';
+                    
+                    if (timerInterval) clearInterval(timerInterval);
+                    timerInterval = setInterval(updateTimer, 1000);
+                    updateTimer();
+                }
+                
+                document.getElementById('focusTime').textContent = appState.focusMinutes;
+            }
+
+            // Rotate quotes
+            function rotateQuote() {
+                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                document.getElementById('quoteText').textContent = randomQuote.text;
+                document.getElementById('quoteAuthor').textContent = `- ${randomQuote.author}`;
+            }
+
+            // Set up all event listeners
+            console.log('Setting up event listeners...');
+
+            // Navigation tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    const tabName = e.currentTarget.dataset.tab;
+                    switchTab(tabName);
+                });
+            });
+
+            // Timer buttons
+            document.getElementById('startBtn').addEventListener('click', startTimer);
+            document.getElementById('slipBtn').addEventListener('click', addSlipTime);
+            document.getElementById('resetBtn').addEventListener('click', resetTimer);
+
+            // Todo functionality  
+            document.getElementById('addTodoBtn').addEventListener('click', addTodo);
+            document.getElementById('todoInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addTodo();
+                }
+            });
+
+            // Calendar navigation
+            document.getElementById('prevMonthBtn').addEventListener('click', function() {
+                changeMonth(-1);
+            });
+            document.getElementById('nextMonthBtn').addEventListener('click', function() {
+                changeMonth(1);
+            });
+
+            // Bilateral stimulation
+            document.getElementById('bilateralBtn').addEventListener('click', toggleBilateral);
+
+            // Initialize the app
+            console.log('Initializing app...');
+            loadState();
+            updateUI();
+            rotateQuote();
+            
+            // Rotate quotes every minute
+            setInterval(rotateQuote, 60000);
+            
+            console.log('App ready!');
+        });
+    </script>
+</body>
+</html>
