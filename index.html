@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>24 Hours - Fast Tracker</title>
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/e/ec/Timeless_PWA_Icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/e/ec/Timeless_PWA_Icon.svg">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1a0033">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="24 Hours">
+    <meta name="description" content="A simple and effective 24-hour fast and habit tracker PWA.">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rubik:wght@300;400;500&display=swap');
 
@@ -277,6 +286,13 @@
             gap: 10px;
             margin-top: 10px;
             flex-wrap: wrap;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        
+        .reminder-controls label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .reminder-time {
@@ -676,7 +692,6 @@
             <div class="nav-tab" data-tab="focus">Focus</div>
         </nav>
 
-        <!-- Goal Setting Modal -->
         <div class="goal-modal" id="goalModal">
             <div class="goal-modal-content">
                 <h3>Set Your Goal</h3>
@@ -693,7 +708,6 @@
             </div>
         </div>
 
-        <!-- Timer Section -->
         <div id="timer" class="content active">
             <div class="timer-container">
                 <div class="timer-circle">
@@ -740,7 +754,6 @@
             </div>
         </div>
 
-        <!-- Tasks Section -->
         <div id="tasks" class="content">
             <div class="todo-container">
                 <div class="todo-input-group">
@@ -749,15 +762,15 @@
                 </div>
                 
                 <div class="reminder-controls">
+                    <label for="reminderTime">Set Reminder:</label>
                     <input type="time" class="reminder-time" id="reminderTime" title="Set reminder time">
-                    <button class="btn btn-slip" id="setReminderBtn">Set Reminder</button>
+                    <button class="btn btn-slip" id="setReminderBtn">Set</button>
                 </div>
                 
                 <ul class="todo-list" id="todoList"></ul>
             </div>
         </div>
 
-        <!-- Calendar Section -->
         <div id="calendar" class="content">
             <div class="calendar-container">
                 <div class="calendar-header">
@@ -770,7 +783,6 @@
             </div>
         </div>
 
-        <!-- Focus Tool Section -->
         <div id="focus" class="content">
             <div class="bilateral-container">
                 <div class="disclaimer">
@@ -817,6 +829,45 @@
     </div>
 
     <script>
+        // PWA Installation & Service Worker registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js').then(registration => {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                }).catch(err => {
+                    console.error('Service Worker registration failed:', err);
+                });
+            });
+        }
+        
+        // PWA Install prompt handling
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            console.log('Install prompt deferred.');
+            // Optionally, show a custom install button here
+        });
+
+        // Function to trigger the PWA install prompt
+        function showInstallPrompt() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt.');
+                    } else {
+                        console.log('User dismissed the install prompt.');
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                console.log('The install prompt has already been shown or is not available.');
+                alert('To install the app, use the "Add to Home Screen" option in your browser menu!');
+            }
+        }
+
+
         // Global notification permission status
         let notificationPermission = false;
         
@@ -1565,7 +1616,7 @@
             const grid = document.getElementById('calendarGrid');
             const title = document.getElementById('calendarTitle');
             const months = ['January', 'February', 'March', 'April', 'May', 'June', 
-                           'July', 'August', 'September', 'October', 'November', 'December'];
+                            'July', 'August', 'September', 'October', 'November', 'December'];
             
             title.textContent = `${months[appState.currentMonth]} ${appState.currentYear}`;
             
