@@ -50,6 +50,22 @@
             animation: glow 2s ease-in-out infinite alternate;
         }
 
+        .goal-display {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #00ff41;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .goal-display:hover {
+            background: rgba(0, 255, 65, 0.2);
+        }
+
         @keyframes glow {
             from { filter: drop-shadow(0 0 10px rgba(0, 255, 65, 0.5)); }
             to { filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.8)); }
@@ -140,7 +156,6 @@
             margin-top: 10px;
         }
 
-        /* Slip counter display */
         .slip-counter {
             font-size: 0.8rem;
             color: #a855f7;
@@ -167,9 +182,15 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             position: relative;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
-        /* Badge for slip count */
+        .btn:active {
+            transform: scale(0.95);
+        }
+
         .btn-badge {
             position: absolute;
             top: -8px;
@@ -230,6 +251,7 @@
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
         .todo-input {
@@ -241,12 +263,29 @@
             font-size: 1rem;
             border-radius: 8px;
             transition: all 0.3s;
+            min-width: 250px;
         }
 
         .todo-input:focus {
             outline: none;
             border-color: #00ff41;
             box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+        }
+
+        .reminder-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .reminder-time {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            color: #fff;
+            border-radius: 6px;
+            font-size: 0.9rem;
         }
 
         .todo-list {
@@ -272,6 +311,11 @@
             background: rgba(255, 107, 107, 0.1);
         }
 
+        .todo-item.reminder-active {
+            border-color: #a855f7;
+            background: rgba(168, 85, 247, 0.1);
+        }
+
         .todo-content {
             display: flex;
             align-items: center;
@@ -291,6 +335,12 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+        }
+
+        .todo-meta {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 5px;
         }
 
         .penalty-display {
@@ -347,6 +397,8 @@
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 0.9rem;
+            position: relative;
         }
 
         .calendar-day.success {
@@ -355,10 +407,30 @@
             box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
         }
 
+        .calendar-day.success::after {
+            content: '✓';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            color: #00ff41;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
         .calendar-day.failed {
             background: rgba(168, 85, 247, 0.2);
             border-color: #a855f7;
             box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+        }
+
+        .calendar-day.failed::after {
+            content: '✗';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            color: #a855f7;
+            font-size: 0.7rem;
+            font-weight: bold;
         }
 
         .calendar-day.today {
@@ -413,7 +485,6 @@
             transform: translateX(100px);
         }
 
-        /* Temptation tracking section */
         .temptation-section {
             background: rgba(255, 107, 107, 0.05);
             border: 1px solid rgba(255, 107, 107, 0.3);
@@ -483,9 +554,83 @@
             font-weight: 500;
         }
 
+        .goal-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .goal-modal.active {
+            display: flex;
+        }
+
+        .goal-modal-content {
+            background: linear-gradient(135deg, #1a0033, #0a0a0a);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+        }
+
+        .goal-modal h3 {
+            color: #00ff41;
+            font-family: 'Orbitron', monospace;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .goal-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(0, 255, 65, 0.3);
+            color: #fff;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .goal-input:focus {
+            outline: none;
+            border-color: #00ff41;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+        }
+
+        .notification-status {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .notification-enabled {
+            color: #00ff41;
+            background: rgba(0, 255, 65, 0.1);
+            border-color: rgba(0, 255, 65, 0.5);
+        }
+
+        .notification-disabled {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            border-color: rgba(255, 107, 107, 0.5);
+        }
+
         @media (max-width: 480px) {
             .app-title {
                 font-size: 2rem;
+                letter-spacing: 1px;
             }
             
             .timer-circle {
@@ -501,6 +646,19 @@
                 font-size: 0.8rem;
                 padding: 10px 5px;
             }
+
+            .btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+
+            .todo-input-group {
+                flex-direction: column;
+            }
+
+            .todo-input {
+                min-width: unset;
+            }
         }
     </style>
 </head>
@@ -508,6 +666,7 @@
     <div class="app-container">
         <header class="header">
             <h1 class="app-title">24 HOURS</h1>
+            <div class="goal-display" id="goalDisplay">Click to set your goal</div>
         </header>
 
         <nav class="nav-tabs">
@@ -516,6 +675,23 @@
             <div class="nav-tab" data-tab="calendar">Calendar</div>
             <div class="nav-tab" data-tab="focus">Focus</div>
         </nav>
+
+        <!-- Goal Setting Modal -->
+        <div class="goal-modal" id="goalModal">
+            <div class="goal-modal-content">
+                <h3>Set Your Goal</h3>
+                <input type="text" class="goal-input" id="goalInput" placeholder="Why are you using this app? What's your goal?">
+                <div class="button-group">
+                    <button class="btn btn-start" id="saveGoalBtn">Save Goal</button>
+                    <button class="btn btn-reset" id="cancelGoalBtn">Cancel</button>
+                </div>
+                
+                <div class="notification-status" id="notificationStatus">
+                    Click "Enable Notifications" to receive reminders
+                </div>
+                <button class="btn btn-start" id="enableNotificationsBtn">Enable Notifications</button>
+            </div>
+        </div>
 
         <!-- Timer Section -->
         <div id="timer" class="content active">
@@ -570,6 +746,11 @@
                 <div class="todo-input-group">
                     <input type="text" class="todo-input" id="todoInput" placeholder="Enter a task to complete today...">
                     <button class="btn btn-start" id="addTodoBtn">Add Task</button>
+                </div>
+                
+                <div class="reminder-controls">
+                    <input type="time" class="reminder-time" id="reminderTime" title="Set reminder time">
+                    <button class="btn btn-slip" id="setReminderBtn">Set Reminder</button>
                 </div>
                 
                 <ul class="todo-list" id="todoList"></ul>
@@ -636,609 +817,976 @@
     </div>
 
     <script>
+        // Global notification permission status
+        let notificationPermission = false;
+        
+        // Enhanced App State with goal and notification features
+        let appState = {
+            // User goal
+            userGoal: '',
+            
+            // Timer state
+            timerActive: false,
+            startTime: null,
+            endTime: null,
+            slipMinutes: 0,
+            slipCount: 0,
+            currentSessionSlips: 0,
+            
+            // Task and reminder state
+            todos: [],
+            taskReminders: {}, // Store reminder times for tasks
+            activeReminders: new Set(), // Track which reminders are active
+            
+            // History and stats
+            fastHistory: {},
+            currentStreak: 0,
+            totalFasts: 0,
+            successfulFasts: 0,
+            totalSlips: 0,
+            
+            // Focus features
+            bilateralActive: false,
+            focusMinutes: 0,
+            focusSessions: 0,
+            
+            // Calendar
+            currentMonth: new Date().getMonth(),
+            currentYear: new Date().getFullYear(),
+            
+            // Urge tracking
+            urges: [],
+            urgesByHour: {},
+            penalties: [],
+            
+            // Notification settings
+            notificationsEnabled: false
+        };
+
+        // Timer and focus intervals
+        let timerInterval = null;
+        let bilateralInterval = null;
+        let bilateralStartTime = null;
+        let reminderCheckInterval = null;
+
         // Make quotes globally accessible
         window.currentQuoteIndex = 0;
         
-        // Global function for the button - this MUST work
+        // Global function for quote changes
         window.changeQuote = function() {
-            console.log('changeQuote called');
-            
-            // Hardcoded quotes array in case the other one fails
-            const simpleQuotes = [
-                { text: "I can do all things through Christ who strengthens me.", author: "Philippians 4:13" },
-                { text: "Be strong and courageous. Do not be afraid; do not be discouraged.", author: "Joshua 1:9" },
-                { text: "The journey of a thousand miles begins with a single step.", author: "Lao Tzu" },
-                { text: "Every moment is a fresh beginning.", author: "T.S. Eliot" },
-                { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" }
-            ];
-            
             try {
-                // Try to use the main quotes array first
-                const quotesToUse = (typeof quotes !== 'undefined' && quotes.length > 0) ? quotes : simpleQuotes;
+                const quotesToUse = quotes.length > 0 ? quotes : simpleQuotes;
                 
-                // Get elements
                 const textEl = document.getElementById('quoteText');
                 const authorEl = document.getElementById('quoteAuthor');
                 
                 if (!textEl || !authorEl) {
-                    alert('Quote elements not found. Please refresh the page.');
+                    console.error('Quote elements not found');
                     return;
                 }
                 
-                // Increment and wrap around
                 window.currentQuoteIndex = (window.currentQuoteIndex + 1) % quotesToUse.length;
                 
-                // Update display
                 const quote = quotesToUse[window.currentQuoteIndex];
                 textEl.textContent = quote.text;
                 authorEl.textContent = '- ' + quote.author;
                 
-                console.log('Quote changed to:', quote.author);
-                
             } catch (error) {
                 console.error('Error changing quote:', error);
-                alert('Error changing quote. Please refresh the page.');
             }
         };
-        
-        // Wait for DOM to load
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Enhanced 24 Hours App starting...');
-            
-            // Enhanced App State with new features
-            let appState = {
-                timerActive: false,
-                startTime: null,
-                endTime: null,
-                slipMinutes: 0,
-                slipCount: 0,  // NEW: Track slip count
-                currentSessionSlips: 0,  // NEW: Slips in current session
-                todos: [],
-                fastHistory: {},
-                currentStreak: 0,
-                totalFasts: 0,
-                successfulFasts: 0,
-                totalSlips: 0,  // NEW: Total slips across all sessions
-                bilateralActive: false,
-                focusMinutes: 0,
-                focusSessions: 0,  // NEW: Number of focus sessions
-                currentMonth: new Date().getMonth(),
-                currentYear: new Date().getFullYear(),
-                urges: [],  // NEW: Track urge timestamps
-                urgesByHour: {},  // NEW: Track urges by hour of day
-                penalties: []  // NEW: Track assigned penalties
-            };
 
-            // Timer variables
-            let timerInterval = null;
-            let bilateralInterval = null;
-            let bilateralStartTime = null;
-
-            // Expanded quotes array (50+ quotes)
-            const quotes = [
-                // Biblical quotes
-                { text: "I can do all things through Christ who strengthens me.", author: "Philippians 4:13" },
-                { text: "Be strong and courageous. Do not be afraid; do not be discouraged.", author: "Joshua 1:9" },
-                { text: "With God all things are possible.", author: "Matthew 19:26" },
-                { text: "The Lord is my strength and my shield.", author: "Psalm 28:7" },
-                { text: "Cast all your anxiety on Him because He cares for you.", author: "1 Peter 5:7" },
-                { text: "God is our refuge and strength, an ever-present help in trouble.", author: "Psalm 46:1" },
-                { text: "For I know the plans I have for you, plans to prosper you and not to harm you.", author: "Jeremiah 29:11" },
-                { text: "The Lord will fight for you; you need only to be still.", author: "Exodus 14:14" },
-                { text: "Trust in the Lord with all your heart.", author: "Proverbs 3:5" },
-                { text: "No temptation has overtaken you except what is common to mankind.", author: "1 Corinthians 10:13" },
-                { text: "Be transformed by the renewing of your mind.", author: "Romans 12:2" },
-                { text: "His grace is sufficient for you.", author: "2 Corinthians 12:9" },
-                { text: "Walk by faith, not by sight.", author: "2 Corinthians 5:7" },
-                { text: "The joy of the Lord is your strength.", author: "Nehemiah 8:10" },
-                { text: "In all things God works for the good of those who love Him.", author: "Romans 8:28" },
-                
-                // Motivational quotes
-                { text: "The journey of a thousand miles begins with a single step.", author: "Lao Tzu" },
-                { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
-                { text: "Every moment is a fresh beginning.", author: "T.S. Eliot" },
-                { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
-                { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
-                { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
-                { text: "Success is the sum of small efforts repeated day in and day out.", author: "Robert Collier" },
-                { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
-                { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
-                { text: "A year from now you may wish you had started today.", author: "Karen Lamb" },
-                { text: "The harder the conflict, the greater the triumph.", author: "George Washington" },
-                { text: "Discipline is the bridge between goals and accomplishment.", author: "Jim Rohn" },
-                { text: "You are never too old to set another goal or to dream a new dream.", author: "C.S. Lewis" },
-                { text: "The difference between ordinary and extraordinary is that little extra.", author: "Jimmy Johnson" },
-                { text: "Champions keep playing until they get it right.", author: "Billie Jean King" },
-                
-                // Persistence and strength quotes
-                { text: "Fall seven times, stand up eight.", author: "Japanese Proverb" },
-                { text: "Strength doesn't come from what you can do. It comes from overcoming the things you once thought you couldn't.", author: "Rikki Rogers" },
-                { text: "The only impossible journey is the one you never begin.", author: "Tony Robbins" },
-                { text: "What lies behind us and what lies before us are tiny matters compared to what lies within us.", author: "Ralph Waldo Emerson" },
-                { text: "You have power over your mind - not outside events. Realize this, and you will find strength.", author: "Marcus Aurelius" },
-                { text: "The greatest glory in living lies not in never falling, but in rising every time we fall.", author: "Nelson Mandela" },
-                { text: "Tough times never last, but tough people do.", author: "Robert H. Schuller" },
-                { text: "When you feel like quitting, think about why you started.", author: "Unknown" },
-                { text: "Your limitation—it's only your imagination.", author: "Unknown" },
-                { text: "Great things never come from comfort zones.", author: "Unknown" },
-                { text: "Dream it. Wish it. Do it.", author: "Unknown" },
-                { text: "Success doesn't just find you. You have to go out and get it.", author: "Unknown" },
-                { text: "The harder you work for something, the greater you'll feel when you achieve it.", author: "Unknown" },
-                { text: "Don't stop when you're tired. Stop when you're done.", author: "Unknown" },
-                { text: "Wake up with determination. Go to bed with satisfaction.", author: "Unknown" },
-                
-                // Self-improvement quotes
-                { text: "Be yourself; everyone else is already taken.", author: "Oscar Wilde" },
-                { text: "The only person you are destined to become is the person you decide to be.", author: "Ralph Waldo Emerson" },
-                { text: "What you get by achieving your goals is not as important as what you become by achieving your goals.", author: "Zig Ziglar" },
-                { text: "Life is 10% what happens to you and 90% how you react to it.", author: "Charles R. Swindoll" },
-                { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
-                { text: "Don't be pushed around by the fears in your mind. Be led by the dreams in your heart.", author: "Roy T. Bennett" },
-                { text: "You are braver than you believe, stronger than you seem, and smarter than you think.", author: "A.A. Milne" },
-                { text: "A goal is not always meant to be reached; it often serves simply as something to aim at.", author: "Bruce Lee" }
-            ];
-
-            // Workout penalties for incomplete tasks
-            const penalties = [
-                { name: "Push-ups", count: 10, unit: "reps" },
-                { name: "Burpees", count: 5, unit: "reps" },
-                { name: "Jumping Jacks", count: 20, unit: "reps" },
-                { name: "Wall Sit", count: 30, unit: "seconds" },
-                { name: "Plank", count: 30, unit: "seconds" },
-                { name: "Squats", count: 15, unit: "reps" },
-                { name: "Lunges", count: 10, unit: "per leg" },
-                { name: "Mountain Climbers", count: 20, unit: "reps" },
-                { name: "High Knees", count: 30, unit: "seconds" },
-                { name: "Walk/Jog", count: 5, unit: "minutes" },
-                { name: "Sit-ups", count: 15, unit: "reps" },
-                { name: "Tricep Dips", count: 10, unit: "reps" },
-                { name: "Calf Raises", count: 20, unit: "reps" },
-                { name: "Side Plank", count: 20, unit: "seconds each side" },
-                { name: "Superman Hold", count: 15, unit: "seconds" }
-            ];
-
-            // Load state from localStorage
-            function loadState() {
-                try {
-                    const saved = localStorage.getItem('24hoursAppState');
-                    if (saved) {
-                        appState = JSON.parse(saved);
-                        updateUI();
+        // Notification System
+        async function requestNotificationPermission() {
+            try {
+                if ('Notification' in window) {
+                    const permission = await Notification.requestPermission();
+                    notificationPermission = permission === 'granted';
+                    appState.notificationsEnabled = notificationPermission;
+                    updateNotificationStatus();
+                    
+                    if (notificationPermission) {
+                        // Test notification
+                        new Notification('24 Hours App', {
+                            body: 'Notifications enabled! You\'ll receive task reminders.',
+                            icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMwMGZmNDEiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHA+Jmx0O3N2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiZndDs8L3A+Cjx0ZXh0IHg9IjEyIiB5PSIxNiIgZmlsbD0iIzAwMCIgZm9udC1zaXplPSIyMCIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPjI0PC90ZXh0Pgo8L3N2Zz4='
+                        });
+                        
+                        // Start reminder checking
+                        startReminderSystem();
                     }
-                } catch (e) {
-                    console.log('Could not load saved state');
+                    
+                    saveState();
+                    return notificationPermission;
+                } else {
+                    console.log('Notifications not supported');
+                    return false;
                 }
+            } catch (error) {
+                console.error('Error requesting notification permission:', error);
+                return false;
             }
+        }
 
-            // Save state to localStorage
-            function saveState() {
+        function updateNotificationStatus() {
+            const statusEl = document.getElementById('notificationStatus');
+            const enableBtn = document.getElementById('enableNotificationsBtn');
+            
+            if (notificationPermission) {
+                statusEl.textContent = '✓ Notifications enabled! You\'ll receive task reminders.';
+                statusEl.className = 'notification-status notification-enabled';
+                enableBtn.style.display = 'none';
+            } else {
+                statusEl.textContent = '⚠️ Enable notifications to receive task reminders';
+                statusEl.className = 'notification-status notification-disabled';
+                enableBtn.style.display = 'block';
+            }
+        }
+
+        function showNotification(title, body, options = {}) {
+            if (notificationPermission && 'Notification' in window) {
                 try {
-                    localStorage.setItem('24hoursAppState', JSON.stringify(appState));
-                } catch (e) {
-                    console.log('Could not save state');
+                    return new Notification(title, {
+                        body: body,
+                        icon: options.icon || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMwMGZmNDEiLz4KPHRleHQgeD0iMTYiIHk9IjIwIiBmaWxsPSIjMDAwIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+MjQ8L3RleHQ+Cjwvc3ZnPg==',
+                        badge: options.badge,
+                        tag: options.tag || 'default',
+                        requireInteraction: options.requireInteraction || false,
+                        silent: options.silent || false
+                    });
+                } catch (error) {
+                    console.error('Error showing notification:', error);
+                    return null;
                 }
             }
+            return null;
+        }
 
-            // Tab switching
-            function switchTab(tabName) {
-                console.log('Switching to tab:', tabName);
+        // Reminder System
+        function startReminderSystem() {
+            if (reminderCheckInterval) {
+                clearInterval(reminderCheckInterval);
+            }
+            
+            // Check reminders every minute
+            reminderCheckInterval = setInterval(checkReminders, 60000);
+        }
+
+        function checkReminders() {
+            if (!notificationPermission) return;
+            
+            const now = new Date();
+            const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            appState.todos.forEach(todo => {
+                if (!todo.completed && appState.taskReminders[todo.id]) {
+                    const reminderTime = appState.taskReminders[todo.id];
+                    const reminderKey = `${todo.id}-${reminderTime}`;
+                    
+                    if (reminderTime === currentTime && !appState.activeReminders.has(reminderKey)) {
+                        // Show reminder notification
+                        const notification = showNotification(
+                            '📋 Task Reminder',
+                            `Time to: ${todo.text}`,
+                            { 
+                                tag: `reminder-${todo.id}`,
+                                requireInteraction: true
+                            }
+                        );
+                        
+                        if (notification) {
+                            appState.activeReminders.add(reminderKey);
+                            
+                            // Remove from active reminders after 5 minutes
+                            setTimeout(() => {
+                                appState.activeReminders.delete(reminderKey);
+                            }, 5 * 60 * 1000);
+                        }
+                    }
+                }
+            });
+        }
+
+        function setTaskReminder(todoId, time) {
+            if (time && todoId) {
+                appState.taskReminders[todoId] = time;
+                console.log(`Reminder set for task ${todoId} at ${time}`);
                 
-                document.querySelectorAll('.nav-tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                document.querySelectorAll('.content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                
-                const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
-                const selectedContent = document.getElementById(tabName);
-                
-                if (selectedTab) selectedTab.classList.add('active');
-                if (selectedContent) selectedContent.classList.add('active');
-                
-                if (tabName === 'calendar') {
-                    renderCalendar();
+                if (notificationPermission) {
+                    showNotification(
+                        '⏰ Reminder Set',
+                        `You'll be reminded at ${time}`,
+                        { silent: true }
+                    );
                 }
             }
+            saveState();
+        }
 
-            // Timer functions
-            function startTimer() {
-                console.log('Starting timer');
-                if (appState.timerActive) return;
+        // Goal Management
+        function showGoalModal() {
+            const modal = document.getElementById('goalModal');
+            const input = document.getElementById('goalInput');
+            
+            input.value = appState.userGoal || '';
+            modal.classList.add('active');
+            
+            // Focus the input after animation
+            setTimeout(() => input.focus(), 100);
+        }
+
+        function hideGoalModal() {
+            const modal = document.getElementById('goalModal');
+            modal.classList.remove('active');
+        }
+
+        function saveGoal() {
+            const input = document.getElementById('goalInput');
+            const goal = input.value.trim();
+            
+            if (goal) {
+                appState.userGoal = goal;
+                updateGoalDisplay();
+                hideGoalModal();
+                saveState();
                 
-                appState.timerActive = true;
-                appState.startTime = Date.now();
-                appState.endTime = Date.now() + (24 * 60 * 60 * 1000);
-                appState.slipMinutes = 0;
-                appState.currentSessionSlips = 0;  // Reset session slips
+                if (notificationPermission) {
+                    showNotification(
+                        '🎯 Goal Set!',
+                        `Your goal: ${goal}`,
+                        { silent: true }
+                    );
+                }
+            }
+        }
+
+        function updateGoalDisplay() {
+            const display = document.getElementById('goalDisplay');
+            if (appState.userGoal) {
+                display.textContent = `🎯 ${appState.userGoal}`;
+            } else {
+                display.textContent = 'Click to set your goal';
+            }
+        }
+
+        // Enhanced quotes array
+        const quotes = [
+            // Biblical quotes
+            { text: "I can do all things through Christ who strengthens me.", author: "Philippians 4:13" },
+            { text: "Be strong and courageous. Do not be afraid; do not be discouraged.", author: "Joshua 1:9" },
+            { text: "With God all things are possible.", author: "Matthew 19:26" },
+            { text: "The Lord is my strength and my shield.", author: "Psalm 28:7" },
+            { text: "Cast all your anxiety on Him because He cares for you.", author: "1 Peter 5:7" },
+            { text: "God is our refuge and strength, an ever-present help in trouble.", author: "Psalm 46:1" },
+            { text: "For I know the plans I have for you, plans to prosper you and not to harm you.", author: "Jeremiah 29:11" },
+            { text: "The Lord will fight for you; you need only to be still.", author: "Exodus 14:14" },
+            { text: "Trust in the Lord with all your heart.", author: "Proverbs 3:5" },
+            { text: "No temptation has overtaken you except what is common to mankind.", author: "1 Corinthians 10:13" },
+            { text: "Be transformed by the renewing of your mind.", author: "Romans 12:2" },
+            { text: "His grace is sufficient for you.", author: "2 Corinthians 12:9" },
+            { text: "Walk by faith, not by sight.", author: "2 Corinthians 5:7" },
+            { text: "The joy of the Lord is your strength.", author: "Nehemiah 8:10" },
+            { text: "In all things God works for the good of those who love Him.", author: "Romans 8:28" },
+            
+            // Motivational quotes
+            { text: "The journey of a thousand miles begins with a single step.", author: "Lao Tzu" },
+            { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
+            { text: "Every moment is a fresh beginning.", author: "T.S. Eliot" },
+            { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+            { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+            { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
+            { text: "Success is the sum of small efforts repeated day in and day out.", author: "Robert Collier" },
+            { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
+            { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
+            { text: "A year from now you may wish you had started today.", author: "Karen Lamb" },
+            { text: "The harder the conflict, the greater the triumph.", author: "George Washington" },
+            { text: "Discipline is the bridge between goals and accomplishment.", author: "Jim Rohn" },
+            { text: "You are never too old to set another goal or to dream a new dream.", author: "C.S. Lewis" },
+            { text: "The difference between ordinary and extraordinary is that little extra.", author: "Jimmy Johnson" },
+            { text: "Champions keep playing until they get it right.", author: "Billie Jean King" },
+            
+            // Persistence and strength quotes
+            { text: "Fall seven times, stand up eight.", author: "Japanese Proverb" },
+            { text: "Strength doesn't come from what you can do. It comes from overcoming the things you once thought you couldn't.", author: "Rikki Rogers" },
+            { text: "The only impossible journey is the one you never begin.", author: "Tony Robbins" },
+            { text: "What lies behind us and what lies before us are tiny matters compared to what lies within us.", author: "Ralph Waldo Emerson" },
+            { text: "You have power over your mind - not outside events. Realize this, and you will find strength.", author: "Marcus Aurelius" },
+            { text: "The greatest glory in living lies not in never falling, but in rising every time we fall.", author: "Nelson Mandela" },
+            { text: "Tough times never last, but tough people do.", author: "Robert H. Schuller" },
+            { text: "When you feel like quitting, think about why you started.", author: "Unknown" },
+            { text: "Your limitation—it's only your imagination.", author: "Unknown" },
+            { text: "Great things never come from comfort zones.", author: "Unknown" },
+            { text: "Dream it. Wish it. Do it.", author: "Unknown" },
+            { text: "Success doesn't just find you. You have to go out and get it.", author: "Unknown" },
+            { text: "The harder you work for something, the greater you'll feel when you achieve it.", author: "Unknown" },
+            { text: "Don't stop when you're tired. Stop when you're done.", author: "Unknown" },
+            { text: "Wake up with determination. Go to bed with satisfaction.", author: "Unknown" },
+            
+            // Self-improvement quotes
+            { text: "Be yourself; everyone else is already taken.", author: "Oscar Wilde" },
+            { text: "The only person you are destined to become is the person you decide to be.", author: "Ralph Waldo Emerson" },
+            { text: "What you get by achieving your goals is not as important as what you become by achieving your goals.", author: "Zig Ziglar" },
+            { text: "Life is 10% what happens to you and 90% how you react to it.", author: "Charles R. Swindoll" },
+            { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
+            { text: "Don't be pushed around by the fears in your mind. Be led by the dreams in your heart.", author: "Roy T. Bennett" },
+            { text: "You are braver than you believe, stronger than you seem, and smarter than you think.", author: "A.A. Milne" },
+            { text: "A goal is not always meant to be reached; it often serves simply as something to aim at.", author: "Bruce Lee" }
+        ];
+
+        // Fallback quotes in case main array fails
+        const simpleQuotes = [
+            { text: "I can do all things through Christ who strengthens me.", author: "Philippians 4:13" },
+            { text: "Be strong and courageous. Do not be afraid; do not be discouraged.", author: "Joshua 1:9" },
+            { text: "The journey of a thousand miles begins with a single step.", author: "Lao Tzu" },
+            { text: "Every moment is a fresh beginning.", author: "T.S. Eliot" },
+            { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" }
+        ];
+
+        // Workout penalties for incomplete tasks
+        const penalties = [
+            { name: "Push-ups", count: 10, unit: "reps" },
+            { name: "Burpees", count: 5, unit: "reps" },
+            { name: "Jumping Jacks", count: 20, unit: "reps" },
+            { name: "Wall Sit", count: 30, unit: "seconds" },
+            { name: "Plank", count: 30, unit: "seconds" },
+            { name: "Squats", count: 15, unit: "reps" },
+            { name: "Lunges", count: 10, unit: "per leg" },
+            { name: "Mountain Climbers", count: 20, unit: "reps" },
+            { name: "High Knees", count: 30, unit: "seconds" },
+            { name: "Walk/Jog", count: 5, unit: "minutes" },
+            { name: "Sit-ups", count: 15, unit: "reps" },
+            { name: "Tricep Dips", count: 10, unit: "reps" },
+            { name: "Calf Raises", count: 20, unit: "reps" },
+            { name: "Side Plank", count: 20, unit: "seconds each side" },
+            { name: "Superman Hold", count: 15, unit: "seconds" }
+        ];
+
+        // Data persistence functions
+        function loadState() {
+            try {
+                const saved = JSON.parse(localStorage.getItem('24hoursAppState') || '{}');
+                Object.assign(appState, saved);
                 
+                // Check notification permission status
+                if ('Notification' in window) {
+                    notificationPermission = Notification.permission === 'granted';
+                    appState.notificationsEnabled = notificationPermission;
+                }
+                
+                updateUI();
+            } catch (e) {
+                console.log('Could not load saved state');
+            }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem('24hoursAppState', JSON.stringify(appState));
+            } catch (e) {
+                console.log('Could not save state');
+            }
+        }
+
+        // Navigation
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
+            const selectedContent = document.getElementById(tabName);
+            
+            if (selectedTab) selectedTab.classList.add('active');
+            if (selectedContent) selectedContent.classList.add('active');
+            
+            if (tabName === 'calendar') {
+                renderCalendar();
+            }
+        }
+
+        // Timer Functions
+        function startTimer() {
+            if (appState.timerActive) return;
+            
+            appState.timerActive = true;
+            appState.startTime = Date.now();
+            appState.endTime = Date.now() + (24 * 60 * 60 * 1000);
+            appState.slipMinutes = 0;
+            appState.currentSessionSlips = 0;
+            
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('slipBtn').style.display = 'inline-block';
+            document.getElementById('resetBtn').style.display = 'inline-block';
+            document.getElementById('slipBadge').style.display = 'none';
+            document.getElementById('slipCounter').textContent = '';
+            
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            updateTimer();
+            
+            // Show motivational notification
+            if (notificationPermission && appState.userGoal) {
+                showNotification(
+                    '🚀 Fast Started!',
+                    `Remember your goal: ${appState.userGoal}`,
+                    { silent: true }
+                );
+            }
+            
+            saveState();
+        }
+
+        function updateTimer() {
+            if (!appState.timerActive) return;
+            
+            const now = Date.now();
+            const totalTime = (appState.endTime + (appState.slipMinutes * 60 * 1000)) - appState.startTime;
+            const elapsed = now - appState.startTime;
+            const remaining = totalTime - elapsed;
+            
+            if (remaining <= 0) {
+                completeTimer(true);
+                return;
+            }
+            
+            const hours = Math.floor(remaining / (1000 * 60 * 60));
+            const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+            
+            const display = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('timerDisplay').textContent = display;
+        }
+
+        function addSlipTime() {
+            appState.slipMinutes += 30;
+            appState.currentSessionSlips++;
+            appState.slipCount++;
+            appState.totalSlips++;
+            
+            // Update slip counter display
+            const slipBadge = document.getElementById('slipBadge');
+            const slipCounter = document.getElementById('slipCounter');
+            
+            slipBadge.textContent = appState.currentSessionSlips;
+            slipBadge.style.display = 'block';
+            
+            if (appState.currentSessionSlips > 0) {
+                slipCounter.textContent = `Slips this session: ${appState.currentSessionSlips}`;
+            }
+            
+            // Update total slips stat
+            document.getElementById('totalSlips').textContent = appState.totalSlips;
+            
+            // Visual feedback
+            const timerCircle = document.querySelector('.timer-circle');
+            timerCircle.style.borderColor = '#a855f7';
+            setTimeout(() => {
+                timerCircle.style.borderColor = '#00ff41';
+            }, 1000);
+            
+            // Show encouraging quote and notification
+            const encouragingQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('quoteText').textContent = encouragingQuote.text;
+            document.getElementById('quoteAuthor').textContent = `- ${encouragingQuote.author}`;
+            
+            if (notificationPermission) {
+                showNotification(
+                    '💪 Stay Strong!',
+                    `"${encouragingQuote.text}"`,
+                    { silent: true }
+                );
+            }
+            
+            saveState();
+        }
+
+        function resetTimer() {
+            completeTimer(false);
+        }
+
+        function completeTimer(success) {
+            appState.timerActive = false;
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            // Record in history
+            const today = new Date().toISOString().split('T')[0];
+            appState.fastHistory[today] = success;
+            
+            // Update stats
+            appState.totalFasts++;
+            if (success) {
+                appState.successfulFasts++;
+                appState.currentStreak++;
+                
+                if (notificationPermission) {
+                    showNotification(
+                        '🎉 Fast Completed!',
+                        `Great job! Current streak: ${appState.currentStreak}`,
+                        { requireInteraction: true }
+                    );
+                }
+            } else {
+                appState.currentStreak = 0;
+                
+                if (notificationPermission) {
+                    showNotification(
+                        '📝 Fast Ended',
+                        'No worries! Every attempt makes you stronger.',
+                        { silent: true }
+                    );
+                }
+            }
+            
+            // Reset UI
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('slipBtn').style.display = 'none';
+            document.getElementById('resetBtn').style.display = 'none';
+            document.getElementById('timerDisplay').textContent = '24:00:00';
+            document.getElementById('slipBadge').style.display = 'none';
+            document.getElementById('slipCounter').textContent = '';
+            
+            updateStats();
+            saveState();
+        }
+
+        // Enhanced Todo Functions with Reminders
+        function addTodo() {
+            const input = document.getElementById('todoInput');
+            const text = input.value.trim();
+            
+            if (text) {
+                const todo = {
+                    id: Date.now(),
+                    text: text,
+                    completed: false,
+                    penalty: null,
+                    penaltyCompleted: false,
+                    createdAt: new Date().toISOString()
+                };
+                appState.todos.push(todo);
+                input.value = '';
+                renderTodos();
+                saveState();
+            }
+        }
+
+        function setReminder() {
+            const timeInput = document.getElementById('reminderTime');
+            const time = timeInput.value;
+            
+            if (!time) {
+                alert('Please select a time for the reminder');
+                return;
+            }
+            
+            if (!notificationPermission) {
+                alert('Please enable notifications first to set reminders');
+                return;
+            }
+            
+            // Find the last added todo (most recent)
+            if (appState.todos.length > 0) {
+                const lastTodo = appState.todos[appState.todos.length - 1];
+                setTaskReminder(lastTodo.id, time);
+                renderTodos();
+                timeInput.value = '';
+            } else {
+                alert('Please add a task first before setting a reminder');
+            }
+        }
+
+        function renderTodos() {
+            const list = document.getElementById('todoList');
+            list.innerHTML = '';
+            
+            appState.todos.forEach(todo => {
+                const li = document.createElement('li');
+                li.className = `todo-item ${todo.completed ? 'completed' : ''} ${todo.penalty && !todo.penaltyCompleted ? 'penalty-pending' : ''} ${appState.taskReminders[todo.id] ? 'reminder-active' : ''}`;
+                
+                // Main todo content
+                const todoContent = document.createElement('div');
+                todoContent.className = 'todo-content';
+                
+                const wrapper = document.createElement('div');
+                wrapper.style.display = 'flex';
+                wrapper.style.alignItems = 'center';
+                wrapper.style.flex = '1';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'todo-checkbox';
+                checkbox.checked = todo.completed;
+                checkbox.addEventListener('change', () => toggleTodo(todo.id));
+                
+                const text = document.createElement('span');
+                text.textContent = todo.text;
+                
+                wrapper.appendChild(checkbox);
+                wrapper.appendChild(text);
+                
+                // Action buttons
+                const actions = document.createElement('div');
+                actions.className = 'todo-actions';
+                
+                if (!todo.completed && !todo.penalty) {
+                    const failBtn = document.createElement('button');
+                    failBtn.className = 'btn btn-reset';
+                    failBtn.textContent = "Can't Complete";
+                    failBtn.style.fontSize = '0.8rem';
+                    failBtn.style.padding = '5px 10px';
+                    failBtn.addEventListener('click', () => assignPenalty(todo.id));
+                    actions.appendChild(failBtn);
+                }
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn btn-reset';
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.style.fontSize = '0.8rem';
+                deleteBtn.style.padding = '5px 10px';
+                deleteBtn.addEventListener('click', () => deleteTodo(todo.id));
+                actions.appendChild(deleteBtn);
+                
+                todoContent.appendChild(wrapper);
+                todoContent.appendChild(actions);
+                li.appendChild(todoContent);
+                
+                // Add metadata (reminder info, creation time)
+                const meta = document.createElement('div');
+                meta.className = 'todo-meta';
+                let metaText = `Created: ${new Date(todo.createdAt).toLocaleString()}`;
+                
+                if (appState.taskReminders[todo.id]) {
+                    metaText += ` | ⏰ Reminder: ${appState.taskReminders[todo.id]}`;
+                }
+                
+                meta.textContent = metaText;
+                li.appendChild(meta);
+                
+                // Penalty display if assigned
+                if (todo.penalty && !todo.penaltyCompleted) {
+                    const penaltyDiv = document.createElement('div');
+                    penaltyDiv.className = 'penalty-display';
+                    penaltyDiv.innerHTML = `
+                        <strong>Penalty:</strong> ${todo.penalty.name} - ${todo.penalty.count} ${todo.penalty.unit}
+                        <button class="btn btn-start" style="margin-left: 10px; padding: 5px 10px; font-size: 0.8rem;">
+                            Complete Penalty
+                        </button>
+                    `;
+                    
+                    penaltyDiv.querySelector('button').addEventListener('click', () => completePenalty(todo.id));
+                    li.appendChild(penaltyDiv);
+                } else if (todo.penaltyCompleted) {
+                    const penaltyDiv = document.createElement('div');
+                    penaltyDiv.className = 'penalty-display';
+                    penaltyDiv.style.opacity = '0.6';
+                    penaltyDiv.innerHTML = `✓ Penalty completed: ${todo.penalty.name}`;
+                    li.appendChild(penaltyDiv);
+                }
+                
+                list.appendChild(li);
+            });
+        }
+
+        function toggleTodo(id) {
+            const todo = appState.todos.find(t => t.id === id);
+            if (todo) {
+                todo.completed = !todo.completed;
+                if (todo.completed && todo.penalty) {
+                    todo.penaltyCompleted = true;
+                }
+                
+                if (todo.completed && notificationPermission) {
+                    showNotification(
+                        '✅ Task Completed!',
+                        `Great job completing: ${todo.text}`,
+                        { silent: true }
+                    );
+                }
+                
+                renderTodos();
+                saveState();
+            }
+        }
+
+        function assignPenalty(id) {
+            const todo = appState.todos.find(t => t.id === id);
+            if (todo) {
+                todo.penalty = penalties[Math.floor(Math.random() * penalties.length)];
+                renderTodos();
+                saveState();
+                
+                if (notificationPermission) {
+                    showNotification(
+                        '🏋️ Penalty Assigned',
+                        `${todo.penalty.name} - ${todo.penalty.count} ${todo.penalty.unit}`,
+                        { silent: true }
+                    );
+                }
+            }
+        }
+
+        function completePenalty(id) {
+            const todo = appState.todos.find(t => t.id === id);
+            if (todo) {
+                todo.penaltyCompleted = true;
+                renderTodos();
+                saveState();
+                
+                if (notificationPermission) {
+                    showNotification(
+                        '💪 Penalty Completed!',
+                        `Great job completing your penalty workout!`,
+                        { silent: true }
+                    );
+                }
+            }
+        }
+
+        function deleteTodo(id) {
+            appState.todos = appState.todos.filter(t => t.id !== id);
+            
+            // Clean up associated reminder
+            if (appState.taskReminders[id]) {
+                delete appState.taskReminders[id];
+            }
+            
+            renderTodos();
+            saveState();
+        }
+
+        // Calendar Functions
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const title = document.getElementById('calendarTitle');
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            title.textContent = `${months[appState.currentMonth]} ${appState.currentYear}`;
+            
+            grid.innerHTML = '';
+            
+            // Add day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                header.textContent = day;
+                grid.appendChild(header);
+            });
+            
+            // Get first day and number of days
+            const firstDay = new Date(appState.currentYear, appState.currentMonth, 1).getDay();
+            const daysInMonth = new Date(appState.currentYear, appState.currentMonth + 1, 0).getDate();
+            const today = new Date();
+            
+            // Add empty cells for days before month starts
+            for (let i = 0; i < firstDay; i++) {
+                grid.appendChild(document.createElement('div'));
+            }
+            
+            // Add days with fast status indicators
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+                
+                const dateStr = `${appState.currentYear}-${String(appState.currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                
+                // Add success/failure indicators
+                if (appState.fastHistory[dateStr] === true) {
+                    dayElement.classList.add('success');
+                    dayElement.title = `Fast completed on ${dateStr}`;
+                } else if (appState.fastHistory[dateStr] === false) {
+                    dayElement.classList.add('failed');
+                    dayElement.title = `Fast attempted on ${dateStr}`;
+                }
+                
+                // Highlight today
+                if (today.getDate() === day && today.getMonth() === appState.currentMonth && 
+                    today.getFullYear() === appState.currentYear) {
+                    dayElement.classList.add('today');
+                }
+                
+                grid.appendChild(dayElement);
+            }
+        }
+
+        function changeMonth(direction) {
+            appState.currentMonth += direction;
+            if (appState.currentMonth < 0) {
+                appState.currentMonth = 11;
+                appState.currentYear--;
+            } else if (appState.currentMonth > 11) {
+                appState.currentMonth = 0;
+                appState.currentYear++;
+            }
+            renderCalendar();
+        }
+
+        // Enhanced Bilateral Stimulation with Session Tracking
+        function toggleBilateral() {
+            const dot = document.getElementById('bilateralDot');
+            const btn = document.getElementById('bilateralBtn');
+            
+            if (appState.bilateralActive) {
+                // Stop session
+                appState.bilateralActive = false;
+                if (bilateralInterval) {
+                    clearInterval(bilateralInterval);
+                    bilateralInterval = null;
+                }
+                btn.textContent = 'Start Focus Session';
+                dot.classList.remove('left', 'right');
+                
+                if (bilateralStartTime) {
+                    const elapsed = Math.floor((Date.now() - bilateralStartTime) / 60000);
+                    appState.focusMinutes += elapsed;
+                    document.getElementById('focusTime').textContent = appState.focusMinutes;
+                    
+                    if (notificationPermission && elapsed > 0) {
+                        showNotification(
+                            '🧘 Focus Session Complete',
+                            `You focused for ${elapsed} minutes. Great job!`,
+                            { silent: true }
+                        );
+                    }
+                    
+                    saveState();
+                }
+            } else {
+                // Start session
+                appState.bilateralActive = true;
+                appState.focusSessions++;
+                btn.textContent = 'Stop Focus Session';
+                bilateralStartTime = Date.now();
+                
+                let isLeft = true;
+                dot.classList.add('left');
+                
+                bilateralInterval = setInterval(() => {
+                    if (isLeft) {
+                        dot.classList.remove('left');
+                        dot.classList.add('right');
+                    } else {
+                        dot.classList.remove('right');
+                        dot.classList.add('left');
+                    }
+                    isLeft = !isLeft;
+                }, 500);
+                
+                document.getElementById('focusSessions').textContent = appState.focusSessions;
+                
+                if (notificationPermission) {
+                    showNotification(
+                        '🎯 Focus Session Started',
+                        'Focus on the moving dot to help center your mind.',
+                        { silent: true }
+                    );
+                }
+                
+                saveState();
+            }
+        }
+
+        // Enhanced Urge/Temptation Tracking
+        function trackTemptation() {
+            const now = new Date();
+            const hour = now.getHours();
+            
+            // Add to urges array with timestamp
+            appState.urges.push({
+                timestamp: now.toISOString(),
+                hour: hour
+            });
+            
+            // Track by hour for pattern analysis
+            if (!appState.urgesByHour[hour]) {
+                appState.urgesByHour[hour] = 0;
+            }
+            appState.urgesByHour[hour]++;
+            
+            // Update UI stats
+            document.getElementById('urgeCount').textContent = appState.urges.length;
+            
+            // Find and display peak urge time
+            let maxUrges = 0;
+            let peakHour = 0;
+            for (let h in appState.urgesByHour) {
+                if (appState.urgesByHour[h] > maxUrges) {
+                    maxUrges = appState.urgesByHour[h];
+                    peakHour = parseInt(h);
+                }
+            }
+            
+            // Format peak hour for display
+            const ampm = peakHour >= 12 ? 'PM' : 'AM';
+            const displayHour = peakHour % 12 || 12;
+            document.getElementById('urgePattern').textContent = `${displayHour}:00 ${ampm}`;
+            
+            // Show encouraging message
+            const encouragingQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            
+            if (notificationPermission) {
+                showNotification(
+                    '💪 Urge Resisted!',
+                    `"${encouragingQuote.text}" - ${encouragingQuote.author}`,
+                    { requireInteraction: true }
+                );
+            } else {
+                alert(`Great job resisting! Remember: "${encouragingQuote.text}" - ${encouragingQuote.author}`);
+            }
+            
+            saveState();
+        }
+
+        // Stats Update Function
+        function updateStats() {
+            document.getElementById('currentStreak').textContent = appState.currentStreak;
+            document.getElementById('totalFasts').textContent = appState.totalFasts;
+            document.getElementById('totalSlips').textContent = appState.totalSlips;
+            
+            const successRate = appState.totalFasts > 0 
+                ? Math.round((appState.successfulFasts / appState.totalFasts) * 100)
+                : 0;
+            document.getElementById('successRate').textContent = `${successRate}%`;
+        }
+
+        // UI Update Function
+        function updateUI() {
+            updateStats();
+            updateGoalDisplay();
+            updateNotificationStatus();
+            renderTodos();
+            
+            if (appState.timerActive && appState.startTime) {
                 document.getElementById('startBtn').style.display = 'none';
                 document.getElementById('slipBtn').style.display = 'inline-block';
                 document.getElementById('resetBtn').style.display = 'inline-block';
-                document.getElementById('slipBadge').style.display = 'none';
-                document.getElementById('slipCounter').textContent = '';
+                
+                if (appState.currentSessionSlips > 0) {
+                    document.getElementById('slipBadge').textContent = appState.currentSessionSlips;
+                    document.getElementById('slipBadge').style.display = 'block';
+                    document.getElementById('slipCounter').textContent = `Slips this session: ${appState.currentSessionSlips}`;
+                }
                 
                 if (timerInterval) clearInterval(timerInterval);
                 timerInterval = setInterval(updateTimer, 1000);
                 updateTimer();
-                saveState();
             }
-
-            function updateTimer() {
-                if (!appState.timerActive) return;
-                
-                const now = Date.now();
-                const totalTime = (appState.endTime + (appState.slipMinutes * 60 * 1000)) - appState.startTime;
-                const elapsed = now - appState.startTime;
-                const remaining = totalTime - elapsed;
-                
-                if (remaining <= 0) {
-                    completeTimer(true);
-                    return;
-                }
-                
-                const hours = Math.floor(remaining / (1000 * 60 * 60));
-                const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-                
-                const display = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                document.getElementById('timerDisplay').textContent = display;
-            }
-
-            // Enhanced slip tracking
-            function addSlipTime() {
-                console.log('Adding slip time');
-                appState.slipMinutes += 30;
-                appState.currentSessionSlips++;
-                appState.slipCount++;
-                appState.totalSlips++;
-                
-                // Update slip counter display
-                const slipBadge = document.getElementById('slipBadge');
-                const slipCounter = document.getElementById('slipCounter');
-                
-                slipBadge.textContent = appState.currentSessionSlips;
-                slipBadge.style.display = 'block';
-                
-                if (appState.currentSessionSlips > 0) {
-                    slipCounter.textContent = `Slips this session: ${appState.currentSessionSlips}`;
-                }
-                
-                // Update total slips stat
-                document.getElementById('totalSlips').textContent = appState.totalSlips;
-                
-                // Visual feedback
-                const timerCircle = document.querySelector('.timer-circle');
-                timerCircle.style.borderColor = '#a855f7';
-                setTimeout(() => {
-                    timerCircle.style.borderColor = '#00ff41';
-                }, 1000);
-                
-                // Show encouraging quote
-                const encouragingQuote = quotes[Math.floor(Math.random() * quotes.length)];
-                document.getElementById('quoteText').textContent = encouragingQuote.text;
-                document.getElementById('quoteAuthor').textContent = `- ${encouragingQuote.author}`;
-                
-                saveState();
-            }
-
-            function resetTimer() {
-                console.log('Resetting timer');
-                completeTimer(false);
-            }
-
-            function completeTimer(success) {
-                appState.timerActive = false;
-                if (timerInterval) {
-                    clearInterval(timerInterval);
-                    timerInterval = null;
-                }
-                
-                // Record in history
-                const today = new Date().toISOString().split('T')[0];
-                appState.fastHistory[today] = success;
-                
-                // Update stats
-                appState.totalFasts++;
-                if (success) {
-                    appState.successfulFasts++;
-                    appState.currentStreak++;
-                } else {
-                    appState.currentStreak = 0;
-                }
-                
-                // Reset UI
-                document.getElementById('startBtn').style.display = 'inline-block';
-                document.getElementById('slipBtn').style.display = 'none';
-                document.getElementById('resetBtn').style.display = 'none';
-                document.getElementById('timerDisplay').textContent = '24:00:00';
-                document.getElementById('slipBadge').style.display = 'none';
-                document.getElementById('slipCounter').textContent = '';
-                
-                updateStats();
-                saveState();
-            }
-
-            // Enhanced todo functions with penalties
-            function addTodo() {
-                const input = document.getElementById('todoInput');
-                const text = input.value.trim();
-                
-                console.log('Adding todo:', text);
-                
-                if (text) {
-                    const todo = {
-                        id: Date.now(),
-                        text: text,
-                        completed: false,
-                        penalty: null,
-                        penaltyCompleted: false,
-                        createdAt: new Date().toISOString()
-                    };
-                    appState.todos.push(todo);
-                    input.value = '';
-                    renderTodos();
-                    saveState();
-                }
-            }
-
-            function renderTodos() {
-                const list = document.getElementById('todoList');
-                list.innerHTML = '';
-                
-                appState.todos.forEach(todo => {
-                    const li = document.createElement('li');
-                    li.className = `todo-item ${todo.completed ? 'completed' : ''} ${todo.penalty && !todo.penaltyCompleted ? 'penalty-pending' : ''}`;
-                    
-                    // Main todo content
-                    const todoContent = document.createElement('div');
-                    todoContent.className = 'todo-content';
-                    
-                    const wrapper = document.createElement('div');
-                    wrapper.style.display = 'flex';
-                    wrapper.style.alignItems = 'center';
-                    wrapper.style.flex = '1';
-                    
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.className = 'todo-checkbox';
-                    checkbox.checked = todo.completed;
-                    checkbox.addEventListener('change', () => toggleTodo(todo.id));
-                    
-                    const text = document.createElement('span');
-                    text.textContent = todo.text;
-                    
-                    wrapper.appendChild(checkbox);
-                    wrapper.appendChild(text);
-                    
-                    // Action buttons
-                    const actions = document.createElement('div');
-                    actions.className = 'todo-actions';
-                    
-                    if (!todo.completed && !todo.penalty) {
-                        const failBtn = document.createElement('button');
-                        failBtn.className = 'btn btn-reset';
-                        failBtn.textContent = "Can't Complete";
-                        failBtn.style.fontSize = '0.8rem';
-                        failBtn.style.padding = '5px 10px';
-                        failBtn.addEventListener('click', () => assignPenalty(todo.id));
-                        actions.appendChild(failBtn);
-                    }
-                    
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'btn btn-reset';
-                    deleteBtn.textContent = 'Delete';
-                    deleteBtn.style.fontSize = '0.8rem';
-                    deleteBtn.style.padding = '5px 10px';
-                    deleteBtn.addEventListener('click', () => deleteTodo(todo.id));
-                    actions.appendChild(deleteBtn);
-                    
-                    todoContent.appendChild(wrapper);
-                    todoContent.appendChild(actions);
-                    li.appendChild(todoContent);
-                    
-                    // Penalty display if assigned
-                    if (todo.penalty && !todo.penaltyCompleted) {
-                        const penaltyDiv = document.createElement('div');
-                        penaltyDiv.className = 'penalty-display';
-                        penaltyDiv.innerHTML = `
-                            <strong>Penalty:</strong> ${todo.penalty.name} - ${todo.penalty.count} ${todo.penalty.unit}
-                            <button class="btn btn-start" style="margin-left: 10px; padding: 5px 10px; font-size: 0.8rem;">
-                                Complete Penalty
-                            </button>
-                        `;
-                        
-                        penaltyDiv.querySelector('button').addEventListener('click', () => completePenalty(todo.id));
-                        li.appendChild(penaltyDiv);
-                    } else if (todo.penaltyCompleted) {
-                        const penaltyDiv = document.createElement('div');
-                        penaltyDiv.className = 'penalty-display';
-                        penaltyDiv.style.opacity = '0.6';
-                        penaltyDiv.innerHTML = `✓ Penalty completed: ${todo.penalty.name}`;
-                        li.appendChild(penaltyDiv);
-                    }
-                    
-                    list.appendChild(li);
-                });
-            }
-
-            function toggleTodo(id) {
-                console.log('Toggling todo:', id);
-                const todo = appState.todos.find(t => t.id === id);
-                if (todo) {
-                    todo.completed = !todo.completed;
-                    if (todo.completed && todo.penalty) {
-                        todo.penaltyCompleted = true;  // Auto-complete penalty if task gets completed
-                    }
-                    renderTodos();
-                    saveState();
-                }
-            }
-
-            function assignPenalty(id) {
-                console.log('Assigning penalty to:', id);
-                const todo = appState.todos.find(t => t.id === id);
-                if (todo) {
-                    // Random penalty assignment
-                    todo.penalty = penalties[Math.floor(Math.random() * penalties.length)];
-                    renderTodos();
-                    saveState();
-                }
-            }
-
-            function completePenalty(id) {
-                console.log('Completing penalty for:', id);
-                const todo = appState.todos.find(t => t.id === id);
-                if (todo) {
-                    todo.penaltyCompleted = true;
-                    renderTodos();
-                    saveState();
-                }
-            }
-
-            function deleteTodo(id) {
-                console.log('Deleting todo:', id);
-                appState.todos = appState.todos.filter(t => t.id !== id);
-                renderTodos();
-                saveState();
-            }
-
-            // Calendar functions
-            function renderCalendar() {
-                const grid = document.getElementById('calendarGrid');
-                const title = document.getElementById('calendarTitle');
-                const months = ['January', 'February', 'March', 'April', 'May', 'June', 
-                               'July', 'August', 'September', 'October', 'November', 'December'];
-                
-                title.textContent = `${months[appState.currentMonth]} ${appState.currentYear}`;
-                
-                grid.innerHTML = '';
-                
-                // Add day headers
-                const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                dayHeaders.forEach(day => {
-                    const header = document.createElement('div');
-                    header.className = 'calendar-day-header';
-                    header.textContent = day;
-                    grid.appendChild(header);
-                });
-                
-                // Get first day and number of days
-                const firstDay = new Date(appState.currentYear, appState.currentMonth, 1).getDay();
-                const daysInMonth = new Date(appState.currentYear, appState.currentMonth + 1, 0).getDate();
-                const today = new Date();
-                
-                // Add empty cells
-                for (let i = 0; i < firstDay; i++) {
-                    grid.appendChild(document.createElement('div'));
-                }
-                
-                // Add days
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const dayElement = document.createElement('div');
-                    dayElement.className = 'calendar-day';
-                    dayElement.textContent = day;
-                    
-                    const dateStr = `${appState.currentYear}-${String(appState.currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    
-                    if (appState.fastHistory[dateStr] === true) {
-                        dayElement.classList.add('success');
-                    } else if (appState.fastHistory[dateStr] === false) {
-                        dayElement.classList.add('failed');
-                    }
-                    
-                    if (today.getDate() === day && today.getMonth() === appState.currentMonth && 
-                        today.getFullYear() === appState.currentYear) {
-                        dayElement.classList.add('today');
-                    }
-                    
-                    grid.appendChild(dayElement);
-                }
-            }
-
-            function changeMonth(direction) {
-                console.log('Changing month:', direction);
-                appState.currentMonth += direction;
-                if (appState.currentMonth < 0) {
-                    appState.currentMonth = 11;
-                    appState.currentYear--;
-                } else if (appState.currentMonth > 11) {
-                    appState.currentMonth = 0;
-                    appState.currentYear++;
-                }
-                renderCalendar();
-            }
-
-            // Enhanced bilateral stimulation with session tracking
-            function toggleBilateral() {
-                console.log('Toggling bilateral');
-                const dot = document.getElementById('bilateralDot');
-                const btn = document.getElementById('bilateralBtn');
-                
-                if (appState.bilateralActive) {
-                    // Stop
-                    appState.bilateralActive = false;
-                    if (bilateralInterval) {
-                        clearInterval(bilateralInterval);
-                        bilateralInterval = null;
-                    }
-                    btn.textContent = 'Start Focus Session';
-                    dot.classList.remove('left', 'right');
-                    
-                    if (bilateralStartTime) {
-                        const elapsed = Math.floor((Date.now() - bilateralStartTime) / 60000);
-                        appState.focusMinutes += elapsed;
-                        document.getElementById('focusTime').textContent = appState.focusMinutes;
-                        saveState();
-                    }
-                } else {
-                    // Start
-                    appState.bilateralActive = true;
-                    appState.focusSessions++;  // Increment session count
-                    btn.textContent = 'Stop Focus Session';
-                    bilateralStartTime = Date.now();
-                    
-                    let isLeft = true;
-                    dot.classList.add('left');
-                    
-                    bilateralInterval = setInterval(() => {
-                        if (isLeft) {
-                            dot.classList.remove('left');
-                            dot.classList.add('right');
-                        } else {
-                            dot.classList.remove('right');
-                            dot.classList.add('left');
-                        }
-                        isLeft = !isLeft;
-                    }, 500);
-                    
-                    document.getElementById('focusSessions').textContent = appState.focusSessions;
-                    saveState();
-                }
-            }
-
-            // Track temptations/urges
-            function trackTemptation() {
-                console.log('Tracking temptation');
-                const now = new Date();
-                const hour = now.getHours();
-                
-                // Add to urges array
-                appState.urges.push({
-                    timestamp: now.toISOString(),
-                    hour: hour
-                });
-                
-                // Track by hour for pattern analysis
-                if (!appState.urgesByHour[hour]) {
-                    appState.urgesByHour[hour] = 0;
-                }
-                appState.urgesByHour[hour]++;
-                
-                // Update UI
-                document.getElementById('urgeCount').textContent = appState.urges.length;
-                
-                // Find peak urge time
+            
+            // Update focus stats
+            document.getElementById('focusTime').textContent = appState.focusMinutes;
+            document.getElementById('focusSessions').textContent = appState.focusSessions;
+            document.getElementById('urgeCount').textContent = appState.urges.length;
+            
+            // Update peak urge time display
+            if (Object.keys(appState.urgesByHour).length > 0) {
                 let maxUrges = 0;
                 let peakHour = 0;
                 for (let h in appState.urgesByHour) {
@@ -1247,80 +1795,38 @@
                         peakHour = parseInt(h);
                     }
                 }
-                
-                // Format peak hour
                 const ampm = peakHour >= 12 ? 'PM' : 'AM';
                 const displayHour = peakHour % 12 || 12;
                 document.getElementById('urgePattern').textContent = `${displayHour}:00 ${ampm}`;
-                
-                // Show encouraging message
-                const encouragingQuote = quotes[Math.floor(Math.random() * quotes.length)];
-                alert(`Great job resisting! Remember: "${encouragingQuote.text}"`);
-                
-                saveState();
             }
+        }
 
-            // Update stats
-            function updateStats() {
-                document.getElementById('currentStreak').textContent = appState.currentStreak;
-                document.getElementById('totalFasts').textContent = appState.totalFasts;
-                document.getElementById('totalSlips').textContent = appState.totalSlips;
-                
-                const successRate = appState.totalFasts > 0 
-                    ? Math.round((appState.successfulFasts / appState.totalFasts) * 100)
-                    : 0;
-                document.getElementById('successRate').textContent = `${successRate}%`;
+        // Quote Rotation Function
+        function rotateQuote() {
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('quoteText').textContent = randomQuote.text;
+            document.getElementById('quoteAuthor').textContent = `- ${randomQuote.author}`;
+        }
+
+        // App Initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Enhanced 24 Hours App starting...');
+            
+            // Check initial notification permission
+            if ('Notification' in window) {
+                notificationPermission = Notification.permission === 'granted';
             }
-
-            // Update UI from state
-            function updateUI() {
-                updateStats();
-                renderTodos();
-                
-                if (appState.timerActive && appState.startTime) {
-                    document.getElementById('startBtn').style.display = 'none';
-                    document.getElementById('slipBtn').style.display = 'inline-block';
-                    document.getElementById('resetBtn').style.display = 'inline-block';
-                    
-                    if (appState.currentSessionSlips > 0) {
-                        document.getElementById('slipBadge').textContent = appState.currentSessionSlips;
-                        document.getElementById('slipBadge').style.display = 'block';
-                        document.getElementById('slipCounter').textContent = `Slips this session: ${appState.currentSessionSlips}`;
-                    }
-                    
-                    if (timerInterval) clearInterval(timerInterval);
-                    timerInterval = setInterval(updateTimer, 1000);
-                    updateTimer();
-                }
-                
-                // Update focus stats
-                document.getElementById('focusTime').textContent = appState.focusMinutes;
-                document.getElementById('focusSessions').textContent = appState.focusSessions;
-                document.getElementById('urgeCount').textContent = appState.urges.length;
-                
-                // Update peak urge time
-                if (Object.keys(appState.urgesByHour).length > 0) {
-                    let maxUrges = 0;
-                    let peakHour = 0;
-                    for (let h in appState.urgesByHour) {
-                        if (appState.urgesByHour[h] > maxUrges) {
-                            maxUrges = appState.urgesByHour[h];
-                            peakHour = parseInt(h);
-                        }
-                    }
-                    const ampm = peakHour >= 12 ? 'PM' : 'AM';
-                    const displayHour = peakHour % 12 || 12;
-                    document.getElementById('urgePattern').textContent = `${displayHour}:00 ${ampm}`;
-                }
+            
+            // Load saved data and initialize UI
+            loadState();
+            updateUI();
+            rotateQuote();
+            
+            // Start reminder system if notifications are enabled
+            if (notificationPermission) {
+                startReminderSystem();
             }
-
-            // Rotate quotes
-            function rotateQuote() {
-                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-                document.getElementById('quoteText').textContent = randomQuote.text;
-                document.getElementById('quoteAuthor').textContent = `- ${randomQuote.author}`;
-            }
-
+            
             // Set up all event listeners
             console.log('Setting up event listeners...');
 
@@ -1332,13 +1838,29 @@
                 });
             });
 
-            // Timer buttons
+            // Goal management
+            document.getElementById('goalDisplay').addEventListener('click', showGoalModal);
+            document.getElementById('saveGoalBtn').addEventListener('click', saveGoal);
+            document.getElementById('cancelGoalBtn').addEventListener('click', hideGoalModal);
+            document.getElementById('enableNotificationsBtn').addEventListener('click', requestNotificationPermission);
+            
+            // Goal input enter key support
+            document.getElementById('goalInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    saveGoal();
+                }
+            });
+
+            // Timer controls
             document.getElementById('startBtn').addEventListener('click', startTimer);
             document.getElementById('slipBtn').addEventListener('click', addSlipTime);
             document.getElementById('resetBtn').addEventListener('click', resetTimer);
 
-            // Todo functionality  
+            // Task management
             document.getElementById('addTodoBtn').addEventListener('click', addTodo);
+            document.getElementById('setReminderBtn').addEventListener('click', setReminder);
+            
+            // Task input enter key support
             document.getElementById('todoInput').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     addTodo();
@@ -1353,22 +1875,31 @@
                 changeMonth(1);
             });
 
-            // Bilateral stimulation
+            // Focus tools
             document.getElementById('bilateralBtn').addEventListener('click', toggleBilateral);
-
-            // Temptation tracking
             document.getElementById('temptationBtn').addEventListener('click', trackTemptation);
 
-            // Initialize the app
-            console.log('Initializing enhanced app...');
-            loadState();
-            updateUI();
-            rotateQuote();
+            // Close modal when clicking outside
+            document.getElementById('goalModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideGoalModal();
+                }
+            });
             
-            // Rotate quotes every minute
-            setInterval(rotateQuote, 60000);
+            // Show goal modal on first run
+            if (!appState.userGoal) {
+                setTimeout(() => {
+                    showGoalModal();
+                }, 1000);
+            }
             
-            console.log('Enhanced 24 Hours App ready!');
+            // Auto-rotate quotes every 2 minutes
+            setInterval(rotateQuote, 120000);
+            
+            // Auto-save every 30 seconds
+            setInterval(saveState, 30000);
+            
+            console.log('Enhanced 24 Hours App ready with goal tracking and notifications!');
         });
     </script>
 </body>
