@@ -1,8 +1,8 @@
 const CACHE_NAME = '24-hours-v1';
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/manifest.json',
+    './',
+    'index.html',
+    'manifest.json',
     'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rubik:wght@300;400;500&display=swap',
     'https://upload.wikimedia.org/wikipedia/commons/e/ec/Timeless_PWA_Icon.svg'
 ];
