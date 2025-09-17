@@ -539,7 +539,7 @@
             <div class="quote-container">
                 <div class="quote-text" id="quoteText">The journey of a thousand miles begins with a single step.</div>
                 <div class="quote-author" id="quoteAuthor">- Lao Tzu</div>
-                <button class="btn" id="newQuoteBtn" style="background: linear-gradient(135deg, #00ff41, #00cc33); color: #000; padding: 8px 20px; margin-top: 15px; font-size: 0.9rem; border-radius: 20px;">
+                <button class="btn" id="newQuoteBtn" onclick="changeQuote()" style="background: linear-gradient(135deg, #00ff41, #00cc33); color: #000; padding: 8px 20px; margin-top: 15px; font-size: 0.9rem; border-radius: 20px;">
                     🔄 New Quote
                 </button>
             </div>
@@ -636,6 +636,51 @@
     </div>
 
     <script>
+        // Make quotes globally accessible
+        window.currentQuoteIndex = 0;
+        
+        // Global function for the button - this MUST work
+        window.changeQuote = function() {
+            console.log('changeQuote called');
+            
+            // Hardcoded quotes array in case the other one fails
+            const simpleQuotes = [
+                { text: "I can do all things through Christ who strengthens me.", author: "Philippians 4:13" },
+                { text: "Be strong and courageous. Do not be afraid; do not be discouraged.", author: "Joshua 1:9" },
+                { text: "The journey of a thousand miles begins with a single step.", author: "Lao Tzu" },
+                { text: "Every moment is a fresh beginning.", author: "T.S. Eliot" },
+                { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" }
+            ];
+            
+            try {
+                // Try to use the main quotes array first
+                const quotesToUse = (typeof quotes !== 'undefined' && quotes.length > 0) ? quotes : simpleQuotes;
+                
+                // Get elements
+                const textEl = document.getElementById('quoteText');
+                const authorEl = document.getElementById('quoteAuthor');
+                
+                if (!textEl || !authorEl) {
+                    alert('Quote elements not found. Please refresh the page.');
+                    return;
+                }
+                
+                // Increment and wrap around
+                window.currentQuoteIndex = (window.currentQuoteIndex + 1) % quotesToUse.length;
+                
+                // Update display
+                const quote = quotesToUse[window.currentQuoteIndex];
+                textEl.textContent = quote.text;
+                authorEl.textContent = '- ' + quote.author;
+                
+                console.log('Quote changed to:', quote.author);
+                
+            } catch (error) {
+                console.error('Error changing quote:', error);
+                alert('Error changing quote. Please refresh the page.');
+            }
+        };
+        
         // Wait for DOM to load
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Enhanced 24 Hours App starting...');
