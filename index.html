@@ -719,7 +719,7 @@
             <div class="goal-modal-content">
                 <h3>Set Your Goal</h3>
                 <input type="text" class="goal-input" id="goalInput" placeholder="Why are you using this app? What's your goal?">
-                <div class="notification-status" id="notificationStatus">
+                <div class="notification-status" id="notificationStatusGoal">
                     Click "Enable Notifications" to receive reminders
                 </div>
                 <div class="button-group">
@@ -803,7 +803,7 @@
                 </div>
             </div>
             
-            <div class="notification-status" id="notificationStatus" style="margin-top: 20px;">
+            <div class="notification-status" id="notificationStatusTimer" style="margin-top: 20px;">
                 Click "Enable Notifications" to receive reminders
             </div>
             <div class="button-group">
@@ -882,24 +882,16 @@
 
     <script>
         // PWA Installation & Service Worker registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                // Register the service worker with the correct path for GitHub Pages
-                navigator.serviceWorker.register('/24hours/service-worker.js').then(registration => {
-                    console.log('Service Worker registered with scope:', registration.scope);
-                }).catch(err => {
-                    console.error('Service Worker registration failed:', err);
-                });
-            });
-        }
-        
-        // PWA Install prompt handling
         let deferredPrompt;
+
+        /**
+         * Listens for the `beforeinstallprompt` event to defer the installation prompt.
+         * This allows us to control when the PWA install prompt is shown to the user.
+         */
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             console.log('Install prompt deferred.');
-            // Optionally, show a custom install button here
         });
 
         // Function to trigger the PWA install prompt
@@ -965,6 +957,9 @@
             // Notification settings
             notificationsEnabled: false
         };
+        
+        // To handle multiple reminders from firing at the same time for the same task
+        appState.activeReminders = new Set();
 
         // Timer and focus intervals
         let timerInterval = null;
@@ -990,7 +985,6 @@
                 
                 window.currentQuoteIndex = (window.currentQuoteIndex + 1) % quotesToUse.length;
                 
-                // Corrected line: removed the comma
                 const quote = quotesToUse[window.currentQuoteIndex];
                 textEl.textContent = quote.text;
                 authorEl.textContent = '- ' + quote.author;
@@ -1018,6 +1012,11 @@
                         
                         // Start reminder checking
                         startReminderSystem();
+
+                        // Offer to install PWA after notifications are enabled
+                        if (deferredPrompt) {
+                             showInstallPrompt();
+                        }
                     }
                     
                     saveState();
@@ -1033,17 +1032,30 @@
         }
 
         function updateNotificationStatus() {
-            const statusEl = document.getElementById('notificationStatus');
+            const statusElGoal = document.getElementById('notificationStatusGoal');
+            const statusElTimer = document.getElementById('notificationStatusTimer');
             const enableBtn = document.getElementById('enableNotificationsBtn');
             
             if (notificationPermission) {
-                statusEl.textContent = '✓ Notifications enabled! You\'ll receive task reminders.';
-                statusEl.className = 'notification-status notification-enabled';
-                if (enableBtn) enableBtn.style.display = 'none';
+                if (statusElGoal) {
+                    statusElGoal.textContent = '✓ Notifications enabled!';
+                    statusElGoal.className = 'notification-status notification-enabled';
+                }
+                if (statusElTimer) {
+                    statusElTimer.textContent = '✓ Notifications enabled!';
+                    statusElTimer.className = 'notification-status notification-enabled';
+                    if (enableBtn) enableBtn.style.display = 'none';
+                }
             } else {
-                statusEl.textContent = '⚠️ Enable notifications to receive task reminders';
-                statusEl.className = 'notification-status notification-disabled';
-                if (enableBtn) enableBtn.style.display = 'block';
+                 if (statusElGoal) {
+                    statusElGoal.textContent = '⚠️ Enable notifications to receive task reminders';
+                    statusElGoal.className = 'notification-status notification-disabled';
+                }
+                if (statusElTimer) {
+                    statusElTimer.textContent = '⚠️ Enable notifications to receive task reminders';
+                    statusElTimer.className = 'notification-status notification-disabled';
+                    if (enableBtn) enableBtn.style.display = 'block';
+                }
             }
         }
 
@@ -1302,9 +1314,35 @@
         function loadState() {
             try {
                 const saved = JSON.parse(localStorage.getItem('24hoursAppState') || '{}');
-                Object.assign(appState, saved);
-                
-                // Check notification permission status
+                // Ensure state properties exist on load
+                Object.assign(appState, {
+                    userGoal: '',
+                    timerActive: false,
+                    startTime: null,
+                    endTime: null,
+                    slipMinutes: 0,
+                    slipCount: 0,
+                    currentSessionSlips: 0,
+                    todos: [],
+                    fastHistory: {},
+                    currentStreak: 0,
+                    totalFasts: 0,
+                    successfulFasts: 0,
+                    totalSlips: 0,
+                    bilateralActive: false,
+                    focusMinutes: 0,
+                    focusSessions: 0,
+                    currentMonth: new Date().getMonth(),
+                    currentYear: new Date().getFullYear(),
+                    urges: [],
+                    urgesByHour: {},
+                    urgesByDayOfWeek: {},
+                    penalties: [],
+                    notificationsEnabled: false,
+                    ...saved
+                });
+
+                // Check notification permission status on load
                 if ('Notification' in window) {
                     notificationPermission = Notification.permission === 'granted';
                     appState.notificationsEnabled = notificationPermission;
@@ -1984,6 +2022,17 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Enhanced 24 Hours App starting...');
             
+            // PWA Service Worker registration
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/24hours/service-worker.js').then(registration => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    }).catch(err => {
+                        console.error('Service Worker registration failed:', err);
+                    });
+                });
+            }
+            
             // Check initial notification permission
             if ('Notification' in window) {
                 notificationPermission = Notification.permission === 'granted';
@@ -2029,6 +2078,7 @@
             document.getElementById('startBtn').addEventListener('click', startTimer);
             document.getElementById('slipBtn').addEventListener('click', reduceSlipTime);
             document.getElementById('resetBtn').addEventListener('click', resetTimer);
+            document.getElementById('enableNotificationsBtn').addEventListener('click', requestNotificationPermission); // FIX: Added click listener for enable notifications button
 
             // Task management
             document.getElementById('addTodoBtn').addEventListener('click', addTodo);
