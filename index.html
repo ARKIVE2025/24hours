@@ -6,7 +6,7 @@
     <title>24 Hours - Fast Tracker</title>
     <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/e/ec/Timeless_PWA_Icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/e/ec/Timeless_PWA_Icon.svg">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/24hours/manifest.json">
     <meta name="theme-color" content="#1a0033">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -235,7 +235,7 @@
 
         .btn-slip:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 30px rgba(168, 85, 247, 0.6);
+            box-shadow: 6px 30px rgba(168, 85, 247, 0.6);
         }
 
         .btn-reset {
@@ -802,6 +802,14 @@
                     <div class="stat-label">Total Slips</div>
                 </div>
             </div>
+            
+            <div class="notification-status" id="notificationStatus" style="margin-top: 20px;">
+                Click "Enable Notifications" to receive reminders
+            </div>
+            <div class="button-group">
+                <button class="btn btn-start" id="enableNotificationsBtn">Enable Notifications</button>
+            </div>
+
         </div>
 
         <div id="tasks" class="content">
@@ -876,7 +884,8 @@
         // PWA Installation & Service Worker registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js').then(registration => {
+                // Register the service worker with the correct path for GitHub Pages
+                navigator.serviceWorker.register('/24hours/service-worker.js').then(registration => {
                     console.log('Service Worker registered with scope:', registration.scope);
                 }).catch(err => {
                     console.error('Service Worker registration failed:', err);
@@ -981,7 +990,7 @@
                 
                 window.currentQuoteIndex = (window.currentQuoteIndex + 1) % quotesToUse.length;
                 
-                const quote = quotesToUse[window.currentQuoteIndex];
+                const quote = quotesTo,Use[window.currentQuoteIndex];
                 textEl.textContent = quote.text;
                 authorEl.textContent = '- ' + quote.author;
                 
