@@ -990,7 +990,8 @@
                 
                 window.currentQuoteIndex = (window.currentQuoteIndex + 1) % quotesToUse.length;
                 
-                const quote = quotesTo,Use[window.currentQuoteIndex];
+                // Corrected line: removed the comma
+                const quote = quotesToUse[window.currentQuoteIndex];
                 textEl.textContent = quote.text;
                 authorEl.textContent = '- ' + quote.author;
                 
