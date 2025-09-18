@@ -595,6 +595,18 @@
             width: 90%;
             border: 2px solid #00ff41;
             box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
         }
 
         .goal-modal h3 {
@@ -641,6 +653,17 @@
             color: #ff6b6b;
             background: rgba(255, 107, 107, 0.1);
             border-color: rgba(255, 107, 107, 0.5);
+        }
+        
+        .stats-modal-content {
+            background: linear-gradient(135deg, #1a0033, #0a0a0a);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+            position: relative;
         }
 
         @media (max-width: 480px) {
@@ -696,15 +719,42 @@
             <div class="goal-modal-content">
                 <h3>Set Your Goal</h3>
                 <input type="text" class="goal-input" id="goalInput" placeholder="Why are you using this app? What's your goal?">
+                <div class="notification-status" id="notificationStatus">
+                    Click "Enable Notifications" to receive reminders
+                </div>
                 <div class="button-group">
                     <button class="btn btn-start" id="saveGoalBtn">Save Goal</button>
                     <button class="btn btn-reset" id="cancelGoalBtn">Cancel</button>
                 </div>
-                
-                <div class="notification-status" id="notificationStatus">
-                    Click "Enable Notifications" to receive reminders
+            </div>
+        </div>
+        
+        <div class="goal-modal" id="statsModal">
+            <div class="stats-modal-content">
+                <button class="close-modal" id="closeStatsBtn">×</button>
+                <h3 id="statsModalTitle"></h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="dayStatsStatus">--</div>
+                        <div class="stat-label">Fast Status</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="dayStatsSlips">0</div>
+                        <div class="stat-label">Slips</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="dayStatsUrges">0</div>
+                        <div class="stat-label">Urges Resisted</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="dayStatsFocus">0</div>
+                        <div class="stat-label">Focus Mins</div>
+                    </div>
                 </div>
-                <button class="btn btn-start" id="enableNotificationsBtn">Enable Notifications</button>
+                <div style="margin-top: 20px;">
+                    <h4>Tasks</h4>
+                    <ul id="dayStatsTasks" class="todo-list" style="margin-top: 10px;"></ul>
+                </div>
             </div>
         </div>
 
@@ -719,7 +769,7 @@
                 <div class="button-group">
                     <button class="btn btn-start" id="startBtn">Start Fast</button>
                     <button class="btn btn-slip" id="slipBtn" style="display:none;">
-                        I Slipped (+30min)
+                        I Slipped (-30min)
                         <span class="btn-badge" id="slipBadge" style="display:none;">0</span>
                     </button>
                     <button class="btn btn-reset" id="resetBtn" style="display:none;">Complete Fast</button>
@@ -759,12 +809,6 @@
                 <div class="todo-input-group">
                     <input type="text" class="todo-input" id="todoInput" placeholder="Enter a task to complete today...">
                     <button class="btn btn-start" id="addTodoBtn">Add Task</button>
-                </div>
-                
-                <div class="reminder-controls">
-                    <label for="reminderTime">Set Reminder:</label>
-                    <input type="time" class="reminder-time" id="reminderTime" title="Set reminder time">
-                    <button class="btn btn-slip" id="setReminderBtn">Set</button>
                 </div>
                 
                 <ul class="todo-list" id="todoList"></ul>
@@ -817,11 +861,11 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="urgeCount">0</div>
-                        <div class="stat-label">Urges Resisted</div>
+                        <div class="stat-label">Total Urges Resisted</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="urgePattern">--</div>
-                        <div class="stat-label">Peak Urge Time</div>
+                        <div class="stat-value" id="peakUrgeTime">--</div>
+                        <div class="stat-label">Daily Peak Time</div>
                     </div>
                 </div>
             </div>
@@ -886,8 +930,6 @@
             
             // Task and reminder state
             todos: [],
-            taskReminders: {}, // Store reminder times for tasks
-            activeReminders: new Set(), // Track which reminders are active
             
             // History and stats
             fastHistory: {},
@@ -908,6 +950,7 @@
             // Urge tracking
             urges: [],
             urgesByHour: {},
+            urgesByDayOfWeek: {},
             penalties: [],
             
             // Notification settings
@@ -960,7 +1003,7 @@
                         // Test notification
                         new Notification('24 Hours App', {
                             body: 'Notifications enabled! You\'ll receive task reminders.',
-                            icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMwMGZmNDEiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHA+Jmx0O3N2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiZndDs8L3A+Cjx0ZXh0IHg9IjEyIiB5PSIxNiIgZmlsbD0iIzAwMCIgZm9udC1zaXplPSIyMCIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPjI0PC90ZXh0Pgo8L3N2Zz4='
+                            icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMwMGZmNDEiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHA+Jmx0O3N2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHRleHQgeD0iMTIiIHk9IjE2IiBmaWxsPSIjMDAwIiBmb250LXNpemU9IjIwIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+MjQ8L3RleHQ+Cjwvc3ZnPg=='
                         });
                         
                         // Start reminder checking
@@ -986,11 +1029,11 @@
             if (notificationPermission) {
                 statusEl.textContent = '✓ Notifications enabled! You\'ll receive task reminders.';
                 statusEl.className = 'notification-status notification-enabled';
-                enableBtn.style.display = 'none';
+                if (enableBtn) enableBtn.style.display = 'none';
             } else {
                 statusEl.textContent = '⚠️ Enable notifications to receive task reminders';
                 statusEl.className = 'notification-status notification-disabled';
-                enableBtn.style.display = 'block';
+                if (enableBtn) enableBtn.style.display = 'block';
             }
         }
 
@@ -1030,11 +1073,10 @@
             const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
             
             appState.todos.forEach(todo => {
-                if (!todo.completed && appState.taskReminders[todo.id]) {
-                    const reminderTime = appState.taskReminders[todo.id];
-                    const reminderKey = `${todo.id}-${reminderTime}`;
+                if (!todo.completed && todo.reminderTime) {
+                    const reminderKey = `${todo.id}-${todo.reminderTime}`;
                     
-                    if (reminderTime === currentTime && !appState.activeReminders.has(reminderKey)) {
+                    if (todo.reminderTime === currentTime && !appState.activeReminders.has(reminderKey)) {
                         // Show reminder notification
                         const notification = showNotification(
                             '📋 Task Reminder',
@@ -1059,8 +1101,9 @@
         }
 
         function setTaskReminder(todoId, time) {
-            if (time && todoId) {
-                appState.taskReminders[todoId] = time;
+            const todo = appState.todos.find(t => t.id === todoId);
+            if (todo && time) {
+                todo.reminderTime = time;
                 console.log(`Reminder set for task ${todoId} at ${time}`);
                 
                 if (notificationPermission) {
@@ -1090,6 +1133,39 @@
             const modal = document.getElementById('goalModal');
             modal.classList.remove('active');
         }
+        
+        function showStatsModal(dateString) {
+            const modal = document.getElementById('statsModal');
+            const history = appState.fastHistory[dateString];
+
+            if (!history) {
+                alert('No data for this date.');
+                return;
+            }
+
+            document.getElementById('statsModalTitle').textContent = `Stats for ${new Date(dateString).toLocaleDateString()}`;
+            document.getElementById('dayStatsStatus').textContent = history.success ? 'Success' : 'Failed';
+            document.getElementById('dayStatsSlips').textContent = history.slips;
+            document.getElementById('dayStatsUrges').textContent = history.urges;
+            document.getElementById('dayStatsFocus').textContent = history.focusMinutes;
+            
+            const tasksList = document.getElementById('dayStatsTasks');
+            tasksList.innerHTML = '';
+            history.tasks.forEach(task => {
+                const li = document.createElement('li');
+                li.textContent = `${task.completed ? '✓' : '✗'} ${task.text}`;
+                li.style.opacity = task.completed ? '0.7' : '1';
+                li.style.textDecoration = task.completed ? 'line-through' : 'none';
+                tasksList.appendChild(li);
+            });
+
+            modal.classList.add('active');
+        }
+
+        function hideStatsModal() {
+            document.getElementById('statsModal').classList.remove('active');
+        }
+
 
         function saveGoal() {
             const input = document.getElementById('goalInput');
@@ -1294,7 +1370,7 @@
             if (!appState.timerActive) return;
             
             const now = Date.now();
-            const totalTime = (appState.endTime + (appState.slipMinutes * 60 * 1000)) - appState.startTime;
+            const totalTime = (24 * 60 * 60 * 1000) - (appState.slipMinutes * 60 * 1000);
             const elapsed = now - appState.startTime;
             const remaining = totalTime - elapsed;
             
@@ -1311,10 +1387,9 @@
             document.getElementById('timerDisplay').textContent = display;
         }
 
-        function addSlipTime() {
-            appState.slipMinutes += 30;
+        function reduceSlipTime() {
+            appState.slipMinutes += 30; // Reduce 30 minutes from remaining time
             appState.currentSessionSlips++;
-            appState.slipCount++;
             appState.totalSlips++;
             
             // Update slip counter display
@@ -1355,6 +1430,14 @@
         }
 
         function resetTimer() {
+            // Check for pending tasks and penalties
+            const incompleteTasks = appState.todos.filter(t => !t.completed || (t.penalty && !t.penaltyCompleted));
+            if (incompleteTasks.length > 0) {
+                alert("You have incomplete tasks or uncompleted penalties. Please finish or delete them before completing the fast.");
+                return;
+            }
+
+            // If no incomplete tasks, proceed with completing the fast
             completeTimer(false);
         }
 
@@ -1365,10 +1448,18 @@
                 timerInterval = null;
             }
             
-            // Record in history
             const today = new Date().toISOString().split('T')[0];
-            appState.fastHistory[today] = success;
             
+            // Record detailed history for the day
+            appState.fastHistory[today] = {
+                date: today,
+                success: success,
+                slips: appState.currentSessionSlips,
+                urges: appState.urges.filter(u => u.timestamp.startsWith(today)).length,
+                focusMinutes: appState.focusMinutes,
+                tasks: appState.todos
+            };
+
             // Update stats
             appState.totalFasts++;
             if (success) {
@@ -1401,6 +1492,7 @@
             document.getElementById('timerDisplay').textContent = '24:00:00';
             document.getElementById('slipBadge').style.display = 'none';
             document.getElementById('slipCounter').textContent = '';
+            appState.todos = [];
             
             updateStats();
             saveState();
@@ -1418,7 +1510,8 @@
                     completed: false,
                     penalty: null,
                     penaltyCompleted: false,
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    reminderTime: null
                 };
                 appState.todos.push(todo);
                 input.value = '';
@@ -1426,9 +1519,9 @@
                 saveState();
             }
         }
-
-        function setReminder() {
-            const timeInput = document.getElementById('reminderTime');
+        
+        function setReminder(event, todoId) {
+            const timeInput = event.target.closest('.todo-item').querySelector('.reminder-time');
             const time = timeInput.value;
             
             if (!time) {
@@ -1436,19 +1529,22 @@
                 return;
             }
             
-            if (!notificationPermission) {
-                alert('Please enable notifications first to set reminders');
-                return;
+            if (Notification.permission !== 'granted') {
+                 if (confirm('Notifications are not enabled. Do you want to enable them now?')) {
+                    requestNotificationPermission();
+                 }
+                 return;
             }
             
-            // Find the last added todo (most recent)
-            if (appState.todos.length > 0) {
-                const lastTodo = appState.todos[appState.todos.length - 1];
-                setTaskReminder(lastTodo.id, time);
+            const todo = appState.todos.find(t => t.id === todoId);
+            if (todo) {
+                todo.reminderTime = time;
                 renderTodos();
-                timeInput.value = '';
-            } else {
-                alert('Please add a task first before setting a reminder');
+                saveState();
+                showNotification(
+                    '⏰ Reminder Set',
+                    `You'll be reminded for "${todo.text}" at ${time}`
+                );
             }
         }
 
@@ -1458,7 +1554,7 @@
             
             appState.todos.forEach(todo => {
                 const li = document.createElement('li');
-                li.className = `todo-item ${todo.completed ? 'completed' : ''} ${todo.penalty && !todo.penaltyCompleted ? 'penalty-pending' : ''} ${appState.taskReminders[todo.id] ? 'reminder-active' : ''}`;
+                li.className = `todo-item ${todo.completed ? 'completed' : ''} ${todo.penalty && !todo.penaltyCompleted ? 'penalty-pending' : ''} ${todo.reminderTime ? 'reminder-active' : ''}`;
                 
                 // Main todo content
                 const todoContent = document.createElement('div');
@@ -1507,17 +1603,31 @@
                 todoContent.appendChild(actions);
                 li.appendChild(todoContent);
                 
-                // Add metadata (reminder info, creation time)
-                const meta = document.createElement('div');
-                meta.className = 'todo-meta';
-                let metaText = `Created: ${new Date(todo.createdAt).toLocaleString()}`;
+                // Add reminder controls and metadata
+                const reminderControls = document.createElement('div');
+                reminderControls.className = 'reminder-controls';
                 
-                if (appState.taskReminders[todo.id]) {
-                    metaText += ` | ⏰ Reminder: ${appState.taskReminders[todo.id]}`;
-                }
+                const reminderLabel = document.createElement('label');
+                reminderLabel.textContent = "Set Reminder:";
                 
-                meta.textContent = metaText;
-                li.appendChild(meta);
+                const reminderTimeInput = document.createElement('input');
+                reminderTimeInput.type = 'time';
+                reminderTimeInput.className = 'reminder-time';
+                reminderTimeInput.title = 'Set reminder time';
+                reminderTimeInput.value = todo.reminderTime || '';
+                
+                const setReminderBtn = document.createElement('button');
+                setReminderBtn.className = 'btn btn-slip';
+                setReminderBtn.textContent = 'Set';
+                setReminderBtn.style.fontSize = '0.8rem';
+                setReminderBtn.style.padding = '5px 10px';
+                setReminderBtn.addEventListener('click', (e) => setReminder(e, todo.id));
+                
+                reminderControls.appendChild(reminderLabel);
+                reminderControls.appendChild(reminderTimeInput);
+                reminderControls.appendChild(setReminderBtn);
+                
+                li.appendChild(reminderControls);
                 
                 // Penalty display if assigned
                 if (todo.penalty && !todo.penaltyCompleted) {
@@ -1601,12 +1711,6 @@
 
         function deleteTodo(id) {
             appState.todos = appState.todos.filter(t => t.id !== id);
-            
-            // Clean up associated reminder
-            if (appState.taskReminders[id]) {
-                delete appState.taskReminders[id];
-            }
-            
             renderTodos();
             saveState();
         }
@@ -1648,16 +1752,22 @@
                 dayElement.textContent = day;
                 
                 const dateStr = `${appState.currentYear}-${String(appState.currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                dayElement.setAttribute('data-date', dateStr);
                 
                 // Add success/failure indicators
-                if (appState.fastHistory[dateStr] === true) {
+                if (appState.fastHistory[dateStr] && appState.fastHistory[dateStr].success === true) {
                     dayElement.classList.add('success');
                     dayElement.title = `Fast completed on ${dateStr}`;
-                } else if (appState.fastHistory[dateStr] === false) {
+                } else if (appState.fastHistory[dateStr] && appState.fastHistory[dateStr].success === false) {
                     dayElement.classList.add('failed');
                     dayElement.title = `Fast attempted on ${dateStr}`;
                 }
                 
+                // Make the day clickable if there's history
+                if (appState.fastHistory[dateStr]) {
+                    dayElement.addEventListener('click', () => showStatsModal(dateStr));
+                }
+
                 // Highlight today
                 if (today.getDate() === day && today.getMonth() === appState.currentMonth && 
                     today.getFullYear() === appState.currentYear) {
@@ -1749,11 +1859,13 @@
         function trackTemptation() {
             const now = new Date();
             const hour = now.getHours();
+            const dayOfWeek = now.getDay(); // 0 for Sunday, 6 for Saturday
             
             // Add to urges array with timestamp
             appState.urges.push({
                 timestamp: now.toISOString(),
-                hour: hour
+                hour: hour,
+                dayOfWeek: dayOfWeek
             });
             
             // Track by hour for pattern analysis
@@ -1761,24 +1873,18 @@
                 appState.urgesByHour[hour] = 0;
             }
             appState.urgesByHour[hour]++;
+
+            // Track by day of the week
+            if (!appState.urgesByDayOfWeek[dayOfWeek]) {
+                appState.urgesByDayOfWeek[dayOfWeek] = 0;
+            }
+            appState.urgesByDayOfWeek[dayOfWeek]++;
             
             // Update UI stats
             document.getElementById('urgeCount').textContent = appState.urges.length;
             
             // Find and display peak urge time
-            let maxUrges = 0;
-            let peakHour = 0;
-            for (let h in appState.urgesByHour) {
-                if (appState.urgesByHour[h] > maxUrges) {
-                    maxUrges = appState.urgesByHour[h];
-                    peakHour = parseInt(h);
-                }
-            }
-            
-            // Format peak hour for display
-            const ampm = peakHour >= 12 ? 'PM' : 'AM';
-            const displayHour = peakHour % 12 || 12;
-            document.getElementById('urgePattern').textContent = `${displayHour}:00 ${ampm}`;
+            updatePeakUrgeTime();
             
             // Show encouraging message
             const encouragingQuote = quotes[Math.floor(Math.random() * quotes.length)];
@@ -1794,6 +1900,25 @@
             }
             
             saveState();
+        }
+        
+        function updatePeakUrgeTime() {
+            let maxUrges = 0;
+            let peakHour = null;
+            for (const h in appState.urgesByHour) {
+                if (appState.urgesByHour[h] > maxUrges) {
+                    maxUrges = appState.urgesByHour[h];
+                    peakHour = parseInt(h);
+                }
+            }
+            
+            if (peakHour !== null) {
+                const ampm = peakHour >= 12 ? 'PM' : 'AM';
+                const displayHour = peakHour % 12 || 12;
+                document.getElementById('peakUrgeTime').textContent = `${displayHour}:00 ${ampm}`;
+            } else {
+                document.getElementById('peakUrgeTime').textContent = '--';
+            }
         }
 
         // Stats Update Function
@@ -1835,21 +1960,7 @@
             document.getElementById('focusTime').textContent = appState.focusMinutes;
             document.getElementById('focusSessions').textContent = appState.focusSessions;
             document.getElementById('urgeCount').textContent = appState.urges.length;
-            
-            // Update peak urge time display
-            if (Object.keys(appState.urgesByHour).length > 0) {
-                let maxUrges = 0;
-                let peakHour = 0;
-                for (let h in appState.urgesByHour) {
-                    if (appState.urgesByHour[h] > maxUrges) {
-                        maxUrges = appState.urgesByHour[h];
-                        peakHour = parseInt(h);
-                    }
-                }
-                const ampm = peakHour >= 12 ? 'PM' : 'AM';
-                const displayHour = peakHour % 12 || 12;
-                document.getElementById('urgePattern').textContent = `${displayHour}:00 ${ampm}`;
-            }
+            updatePeakUrgeTime();
         }
 
         // Quote Rotation Function
@@ -1893,7 +2004,9 @@
             document.getElementById('goalDisplay').addEventListener('click', showGoalModal);
             document.getElementById('saveGoalBtn').addEventListener('click', saveGoal);
             document.getElementById('cancelGoalBtn').addEventListener('click', hideGoalModal);
-            document.getElementById('enableNotificationsBtn').addEventListener('click', requestNotificationPermission);
+            
+            // Stats modal close
+            document.getElementById('closeStatsBtn').addEventListener('click', hideStatsModal);
             
             // Goal input enter key support
             document.getElementById('goalInput').addEventListener('keypress', function(e) {
@@ -1904,12 +2017,11 @@
 
             // Timer controls
             document.getElementById('startBtn').addEventListener('click', startTimer);
-            document.getElementById('slipBtn').addEventListener('click', addSlipTime);
+            document.getElementById('slipBtn').addEventListener('click', reduceSlipTime);
             document.getElementById('resetBtn').addEventListener('click', resetTimer);
 
             // Task management
             document.getElementById('addTodoBtn').addEventListener('click', addTodo);
-            document.getElementById('setReminderBtn').addEventListener('click', setReminder);
             
             // Task input enter key support
             document.getElementById('todoInput').addEventListener('keypress', function(e) {
@@ -1934,6 +2046,12 @@
             document.getElementById('goalModal').addEventListener('click', function(e) {
                 if (e.target === this) {
                     hideGoalModal();
+                }
+            });
+            
+            document.getElementById('statsModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideStatsModal();
                 }
             });
             
