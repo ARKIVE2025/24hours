@@ -700,6 +700,23 @@
             }
         }
     </style>
+    
+    <script>
+        (function(w, d) {
+            w.PushEngage = w.PushEngage || [];
+            w._peq = w._peq || [];
+            PushEngage.push(['init', {
+                appId: '8aee92a2-d626-4168-ae26-5965e5a301b5'
+            }]);
+
+            var e = d.createElement('script');
+
+            e.src = 'https://clientcdn.pushengage.com/sdks/pushengage-web-sdk.js';
+            e.async = true;
+            e.type = 'text/javascript';
+            d.head.appendChild(e);
+        })(window, document);
+    </script>
 </head>
 <body>
     <div class="app-container">
@@ -1007,7 +1024,7 @@
                         // Test notification
                         new Notification('24 Hours App', {
                             body: 'Notifications enabled! You\'ll receive task reminders.',
-                            icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMwMGZmNDEiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHA+Jmx0O3N2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHRleHQgeD0iMTIiIHk9IjE2IiBmaWxsPSIjMDAwIiBmb250LXNpemU9IjIwIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+MjQ8L3RleHQ+Cjwvc3ZnPg=='
+                            icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMwMGZmNDEiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHRleHQgeD0iMTIiIHk9IjE2IiBmaWxsPSIjMDAwIiBmb250LXNpemU9IjIwIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+MjQ8L3RleHQ+Cjwvc3ZnPg=='
                         });
                         
                         // Start reminder checking
@@ -1159,16 +1176,28 @@
         function showStatsModal(dateString) {
             const modal = document.getElementById('statsModal');
             const history = appState.fastHistory[dateString];
-
+            
             if (!history) {
                 alert('No data for this date.');
                 return;
             }
 
-            document.getElementById('statsModalTitle').textContent = `Stats for ${new Date(dateString).toLocaleDateString()}`;
+            // Update stats
+            const date = new Date(dateString);
+            document.getElementById('statsModalTitle').textContent = `Stats for ${date.toLocaleDateString()}`;
             document.getElementById('dayStatsStatus').textContent = history.success ? 'Success' : 'Failed';
             document.getElementById('dayStatsSlips').textContent = history.slips;
-            document.getElementById('dayStatsUrges').textContent = history.urges;
+            
+            // Filter urges for the selected day
+            const dayUrges = appState.urges.filter(urge => {
+                const urgeDate = new Date(urge.timestamp).toISOString().split('T')[0];
+                return urgeDate === dateString;
+            });
+
+            // Count resisted urges for the day
+            const resistedUrges = dayUrges.filter(urge => urge.resisted === true).length;
+            document.getElementById('dayStatsUrges').textContent = resistedUrges;
+            
             document.getElementById('dayStatsFocus').textContent = history.focusMinutes;
             
             const tasksList = document.getElementById('dayStatsTasks');
@@ -1439,6 +1468,9 @@
             appState.slipMinutes += 30; // Reduce 30 minutes from remaining time
             appState.currentSessionSlips++;
             appState.totalSlips++;
+            
+            // Log this slip as an urge that was not resisted
+            trackTemptation(false);
             
             // Update slip counter display
             const slipBadge = document.getElementById('slipBadge');
@@ -1904,58 +1936,69 @@
         }
 
         // Enhanced Urge/Temptation Tracking
-        function trackTemptation() {
+        function trackTemptation(resisted = true) {
             const now = new Date();
             const hour = now.getHours();
             const dayOfWeek = now.getDay(); // 0 for Sunday, 6 for Saturday
             
-            // Add to urges array with timestamp
+            // Add to urges array with timestamp and resisted status
             appState.urges.push({
                 timestamp: now.toISOString(),
+                resisted: resisted,
                 hour: hour,
                 dayOfWeek: dayOfWeek
             });
             
             // Track by hour for pattern analysis
             if (!appState.urgesByHour[hour]) {
-                appState.urgesByHour[hour] = 0;
+                appState.urgesByHour[hour] = { resisted: 0, slipped: 0 };
             }
-            appState.urgesByHour[hour]++;
+            if (resisted) {
+                 appState.urgesByHour[hour].resisted++;
+            } else {
+                 appState.urgesByHour[hour].slipped++;
+            }
 
             // Track by day of the week
             if (!appState.urgesByDayOfWeek[dayOfWeek]) {
-                appState.urgesByDayOfWeek[dayOfWeek] = 0;
+                appState.urgesByDayOfWeek[dayOfWeek] = { resisted: 0, slipped: 0 };
             }
-            appState.urgesByDayOfWeek[dayOfWeek]++;
+            if (resisted) {
+                appState.urgesByDayOfWeek[dayOfWeek].resisted++;
+            } else {
+                appState.urgesByDayOfWeek[dayOfWeek].slipped++;
+            }
             
             // Update UI stats
-            document.getElementById('urgeCount').textContent = appState.urges.length;
+            document.getElementById('urgeCount').textContent = appState.urges.filter(u => u.resisted).length;
             
             // Find and display peak urge time
             updatePeakUrgeTime();
             
-            // Show encouraging message
-            const encouragingQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            // Show encouraging message only for resisted urges
+            if (resisted) {
+                 const encouragingQuote = quotes[Math.floor(Math.random() * quotes.length)];
             
-            if (notificationPermission) {
-                showNotification(
-                    '💪 Urge Resisted!',
-                    `"${encouragingQuote.text}" - ${encouragingQuote.author}`,
-                    { requireInteraction: true }
-                );
-            } else {
-                alert(`Great job resisting! Remember: "${encouragingQuote.text}" - ${encouragingQuote.author}`);
+                if (notificationPermission) {
+                    showNotification(
+                        '💪 Urge Resisted!',
+                        `"${encouragingQuote.text}" - ${encouragingQuote.author}`,
+                        { requireInteraction: true }
+                    );
+                } else {
+                    alert(`Great job resisting! Remember: "${encouragingQuote.text}" - ${encouragingQuote.author}`);
+                }
             }
-            
+
             saveState();
         }
         
         function updatePeakUrgeTime() {
-            let maxUrges = 0;
+            let maxResisted = 0;
             let peakHour = null;
             for (const h in appState.urgesByHour) {
-                if (appState.urgesByHour[h] > maxUrges) {
-                    maxUrges = appState.urgesByHour[h];
+                if (appState.urgesByHour[h].resisted > maxResisted) {
+                    maxResisted = appState.urgesByHour[h].resisted;
                     peakHour = parseInt(h);
                 }
             }
@@ -2007,7 +2050,7 @@
             // Update focus stats
             document.getElementById('focusTime').textContent = appState.focusMinutes;
             document.getElementById('focusSessions').textContent = appState.focusSessions;
-            document.getElementById('urgeCount').textContent = appState.urges.length;
+            document.getElementById('urgeCount').textContent = appState.urges.filter(u => u.resisted).length;
             updatePeakUrgeTime();
         }
 
@@ -2100,7 +2143,7 @@
 
             // Focus tools
             document.getElementById('bilateralBtn').addEventListener('click', toggleBilateral);
-            document.getElementById('temptationBtn').addEventListener('click', trackTemptation);
+            document.getElementById('temptationBtn').addEventListener('click', () => trackTemptation(true));
 
             // Close modal when clicking outside
             document.getElementById('goalModal').addEventListener('click', function(e) {
