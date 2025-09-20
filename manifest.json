@@ -5,18 +5,44 @@
   "start_url": "/24hours/",
   "scope": "/24hours/",
   "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "minimal-ui"
+  ],
+  "orientation": "portrait",
   "background_color": "#1a0033",
   "theme_color": "#00ff41",
+  "categories": [
+    "health",
+    "fitness",
+    "productivity",
+    "tools"
+  ],
+  "id": "/24hours/",
   "icons": [
     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Timeless_PWA_Icon.svg",
+      "src": "https://www.google.com/search?q=https://placehold.co/192x192/00ff41/1a0033%3Ftext%3D24",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/png"
     },
     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Timeless_PWA_Icon.svg",
+      "src": "https://www.google.com/search?q=https://placehold.co/512x512/00ff41/1a0033%3Ftext%3D24",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://www.google.com/search?q=https://placehold.co/600x1200/1a0033/00ff41%3Ftext%3DMobile%2BView",
+      "sizes": "600x1200",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "https://www.google.com/search?q=https://placehold.co/1200x800/1a0033/00ff41%3Ftext%3DDesktop%2BView",
+      "sizes": "1200x800",
+      "type": "image/png",
+      "form_factor": "wide"
     }
   ]
 }
