@@ -1,4 +1,5 @@
-const CACHE_NAME = '24-hours-v1';
+// Set a new cache name to ensure a fresh cache on activation
+const CACHE_NAME = '24-hours-v2';
 const urlsToCache = [
     './',
     'index.html',
@@ -97,4 +98,19 @@ self.addEventListener('notificationclick', (event) => {
                 return clients.openWindow('/index.html');
             })
     );
+});
+
+// New feature: Background Sync for offline data submission
+self.addEventListener('sync', (event) => {
+    if (event.tag === 'sync-data') {
+        console.log('Service Worker: Performing background sync...');
+        event.waitUntil(
+            // In a real application, this is where you would send saved data to your server.
+            // For this example, we'll just log a success message.
+            new Promise((resolve, reject) => {
+                console.log('Service Worker: Data submitted successfully.');
+                resolve();
+            })
+        );
+    }
 });
